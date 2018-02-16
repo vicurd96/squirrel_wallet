@@ -1,5 +1,7 @@
 # Squirrel Cryptocurrency Wallet (Django Project)
 
+## Introduction ##
+
 We are a group of students from the Department of Computation of the Experimental
 Faculty of Sciences (FEC) in Maracaibo, Venezuela.
 
