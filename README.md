@@ -1,4 +1,4 @@
-# Squirrel Cryptocurrency Wallet (Django Project)
+# Squirrel Cryptocurrency Wallet (Django Project) #
 
 ## Introduction ##
 
