@@ -1,24 +1,36 @@
 from django.http import HttpResponse,JsonResponse
-from wallet.models import Currency
 from django.core.serializers import serialize
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
-from wallet.serializers import CurrencySerializer
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.decorators import api_view
 
-@api_view(['GET', 'POST'])
-def index(request):
-    if request.method == 'GET':
-        curr_serializer = CurrencySerializer(Currency.objects.all(),many=True)
-        return Response(curr_serializer.data)
-def detail(request, question_id):
-    return HttpResponse("You're looking at question %s." % question_id)
+from django.http import Http404
+from rest_framework.views import APIView
+from rest_framework import generics, permissions
+from .models import Currency,User,Wallet
+from .serializers import CurrencySerializer,UserSerializer
 
-def results(request, question_id):
-    response = "You're looking at the results of question %s."
-    return HttpResponse(response % question_id)
+class Users(APIView):
+    def get_object(self,pk):
+        try:
+            return User.objects.get(pk=pk)
+        except User.DoesNotExist:
+            raise Http404
 
-def vote(request, question_id):
-    return HttpResponse("You're voting on question %s." % question_id)
+    def get(self,request,pk,format=None):
+        user = self.get_object(pk)
+        serializer = UserSerializer(user)
+        return Response(serializer.data)
+
+class Currencies(APIView):
+    def get_object(self,pk):
+        try:
+            return Currency.objects.get(pk=pk)
+        except Currency.DoesNotExist:
+            raise Http404
+
+    def get(self,request,pk,format=None):
+        currency = self.get_object(pk)
+        serializer = CurrencySerializer(currency)
+        return Response(serializer.data)

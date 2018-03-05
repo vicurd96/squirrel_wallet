@@ -11,7 +11,7 @@ class User(models.Model):
         (MUJER,'MUJER'),
         (OTRO,'OTRO')
     )
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=True)
     name = models.CharField(null=False,blank=False,max_length=20)
     last_name = models.CharField(null=False,blank=False,max_length=20)
     password = models.CharField(null=False,blank=False,max_length=32)
@@ -22,6 +22,9 @@ class User(models.Model):
     gender = models.CharField(null=False,max_length=2,choices=GENDER_CHOICES,default=OTRO)
     country = CountryField(null=False,blank_label='(Select country)')
     last_update = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.id
 
 class Currency(models.Model):
     abrev = models.CharField(null=False,unique=True,max_length=3)

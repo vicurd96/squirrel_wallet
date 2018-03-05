@@ -1,11 +1,16 @@
 from rest_framework import serializers
-from wallet.models import Currency
+from wallet.models import Currency,User
 
 
 class CurrencySerializer(serializers.ModelSerializer):
     class Meta:
         model = Currency
         fields = ('id','abrev','name')
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id','name','last_name','email','gender','country')
 
     '''id = serializers.IntegerField(read_only=True)
     abrev = serializers.CharField(required=True, allow_blank=True, max_length=3)
