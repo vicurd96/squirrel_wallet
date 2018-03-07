@@ -1,0 +1,16 @@
+Metadata-Version: 2.0
+Name: blockcypher
+Version: 1.0.73
+Summary: BlockCypher Python Library
+Home-page: https://github.com/blockcypher/blockcypher-python/
+Author: Michael Flaxman
+Author-email: mflaxman+blockcypher@gmail.com
+License: UNKNOWN
+Platform: UNKNOWN
+Requires-Dist: bitcoin (==1.1.39)
+Requires-Dist: python-dateutil (==2.2)
+Requires-Dist: requests (==2.4.3)
+
+UNKNOWN
+
+

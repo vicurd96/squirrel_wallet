@@ -1,0 +1,8 @@
+blockchain==1.4.0
+blockcypher==1.0.73
+Django==2.0.2
+django-countries==5.1.1
+djangorestframework==3.7.7
+web3==3.16.5
+psycopg2==2.7.4
+psycopg2-binary==2.7.4
