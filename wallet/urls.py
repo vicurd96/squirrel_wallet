@@ -1,18 +1,22 @@
 #from django.conf.urls import url
 from django.urls import path
 from django.conf.urls import url, include
-from wallet.views import Users,Currencies
+from wallet.views import *
+from django.contrib.auth import *
 import uuid
 
 user_urls = [
-    path('<uuid:pk>/',Users.as_view())
+    path('create/',NewUser.as_view()),
+    path('list/',ListUsers.as_view()),
+    path('search/',SearchUser.as_view()),
     ]
 
 currency_urls = [
-    path('<int:pk>/',Currencies.as_view())
+    path('',Currencies.as_view())
     ]
 
 urlpatterns = [
-    path('users/',include(user_urls)),
+    path('', include('django.contrib.auth.urls')),
+    path('',include(user_urls)),
     path('currencies/',include(currency_urls))
 ]

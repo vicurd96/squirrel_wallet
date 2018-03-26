@@ -27,12 +27,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 
 INSTALLED_APPS = [
     'rest_framework',
-    'wallet.apps.WalletConfig',
+    'django_filters',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -40,7 +39,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_countries',
+    'wallet',
+    'django_extensions'
 ]
+
+AUTH_USER_MODEL = 'wallet.User'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -57,7 +60,7 @@ ROOT_URLCONF = 'squirrel_wallet.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['./templates',],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
