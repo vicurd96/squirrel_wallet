@@ -1,7 +1,6 @@
 from rest_framework import serializers
 from wallet.models import Currency,User
 
-
 class CurrencySerializer(serializers.ModelSerializer):
     class Meta:
         model = Currency

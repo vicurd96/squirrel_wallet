@@ -5,26 +5,16 @@ from .serializers import *
 import django_filters.rest_framework
 from django.contrib.auth.forms import AuthenticationForm
 from two_factor.views import LoginView
-from django.views.generic import TemplateView
+from django.urls import reverse_lazy
+from django.views import generic
+from .forms import UserCreationForm
 
-class NewUser(generics.CreateAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserCreateSerializer
+class SignUp(generic.CreateView):
+    form_class = UserCreationForm
+    success_url = reverse_lazy('login')
+    template_name = 'templates/signup.html'
 
-class ListUsers(generics.ListAPIView):
-    serializer_class = UserListSerializer
-    queryset = User.objects.all()
-    filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
-
-class SearchUser(generics.RetrieveAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserListSerializer
-
-class Currencies(generics.ListAPIView):
-    queryset = Currency.objects.all()
-    serializer_class = CurrencySerializer
-
-class LoginView(LoginView):
+class Login(LoginView):
     template_name = 'templates/login.html'
     def get_user(self):
         self.request.user.backend = 'django.contrib.auth.backends.ModelBackend'

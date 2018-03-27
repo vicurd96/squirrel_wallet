@@ -8,11 +8,8 @@ from two_factor.views import (BackupTokensView, DisableView, PhoneDeleteView, Ph
 ProfileView, QRGeneratorView, SetupCompleteView, SetupView,)
 
 user_urls = [
-    path('create/',NewUser.as_view()),
-    path('list/',ListUsers.as_view()),
-    path('search/',SearchUser.as_view()),
-    path('currencies/',Currencies.as_view(),name='currencies'),
-    path('login/',view=LoginView.as_view(),name='login'),
+    path('login/',view=Login.as_view(),name='login'),
+    path('signup/',view=SignUp.as_view(),name='signup'),
     ]
 two_factor = [
     path(
