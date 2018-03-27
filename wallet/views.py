@@ -5,6 +5,7 @@ from .serializers import *
 import django_filters.rest_framework
 from django.contrib.auth.forms import AuthenticationForm
 from two_factor.views import LoginView
+from django.views.generic import TemplateView
 
 class NewUser(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -24,7 +25,7 @@ class Currencies(generics.ListAPIView):
     serializer_class = CurrencySerializer
 
 class LoginView(LoginView):
-    template_name = 'system/core/login.html'
+    template_name = 'templates/login.html'
     def get_user(self):
         self.request.user.backend = 'django.contrib.auth.backends.ModelBackend'
         return self.request.user
