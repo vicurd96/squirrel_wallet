@@ -4,17 +4,16 @@ from django.conf.urls import url, include
 from wallet.views import *
 from django.contrib.auth import *
 from two_factor.urls import urlpatterns as tf_urls
-from two_factor.views import (BackupTokensView, DisableView, LoginView, PhoneDeleteView, PhoneSetupView,
+from two_factor.views import (BackupTokensView, DisableView, PhoneDeleteView, PhoneSetupView,
 ProfileView, QRGeneratorView, SetupCompleteView, SetupView,)
 
 user_urls = [
     path('create/',NewUser.as_view()),
     path('list/',ListUsers.as_view()),
     path('search/',SearchUser.as_view()),
-    path('currencies/',Currencies.as_view()),
+    path('currencies/',Currencies.as_view(),name='currencies'),
     path('login/',view=LoginView.as_view(),name='login'),
     ]
-
 two_factor = [
     path(
         'account/two_factor/setup/',
@@ -59,6 +58,7 @@ two_factor = [
 ]
 
 urlpatterns = [
-    path('', include(two_factor)),
     path('',include(user_urls)),
+    path('', include('django.contrib.auth.urls')),
+    path('', include(two_factor)),
 ]

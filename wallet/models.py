@@ -85,14 +85,6 @@ class Value(models.Model):
     currency = models.ForeignKey('Currency',on_delete=models.PROTECT)
     value = models.DecimalField(max_digits=16, decimal_places=4,default=0)
 
-class Security(models.Model):
-    description = models.CharField(null=False,blank=False,max_length=50)
-
-class Protection(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
-    security = models.ForeignKey('Security', on_delete=models.PROTECT)
-    enabled = models.BooleanField(default=False)
-
 class Wallet(models.Model):
     address = models.CharField(primary_key = True,max_length=64)
     public_key = models.CharField(null=False,unique=True,max_length=64)

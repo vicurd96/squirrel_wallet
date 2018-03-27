@@ -3,7 +3,8 @@ from rest_framework import generics, permissions
 from .models import *
 from .serializers import *
 import django_filters.rest_framework
-import django.contrib.auth
+from django.contrib.auth.forms import AuthenticationForm
+from two_factor.views import LoginView
 
 class NewUser(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -21,3 +22,9 @@ class SearchUser(generics.RetrieveAPIView):
 class Currencies(generics.ListAPIView):
     queryset = Currency.objects.all()
     serializer_class = CurrencySerializer
+
+class LoginView(LoginView):
+    template_name = 'system/core/login.html'
+    def get_user(self):
+        self.request.user.backend = 'django.contrib.auth.backends.ModelBackend'
+        return self.request.user
