@@ -10,6 +10,7 @@ ProfileView, QRGeneratorView, SetupCompleteView, SetupView,)
 user_urls = [
     path('login/',view=Login.as_view(),name='login'),
     path('signup/',view=SignUp.as_view(),name='signup'),
+    path('dashboard',view=Dashboard.as_view(),name='dashboard'),
     ]
 two_factor = [
     path(

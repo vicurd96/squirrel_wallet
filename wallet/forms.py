@@ -1,10 +1,9 @@
-from django.forms import ModelForm
 from django import forms
 from .models import *
 from django_countries.fields import CountryField
 from django.utils.translation import gettext as _
 
-class UserCreationForm(ModelForm):
+class UserCreationForm(forms.ModelForm):
     error_messages = {
         'password_mismatch': _("The two password fields didn't match."),
     }
