@@ -44,7 +44,7 @@ class User(AbstractBaseUser,PermissionsMixin):
     first_name = models.CharField(_('First name'),null=False,blank=False,max_length=20)
     last_name = models.CharField(_('Last name'),null=False,blank=False,max_length=20)
     email = models.EmailField(_('Email'),unique=True,null=False,blank=False)
-    birthdate = models.DateField(_('Birthday'),null=False,blank=False)
+    birthdate = models.DateField(_('Birthdate'),null=False,blank=False)
     address = models.CharField(_('Address'),null=True,blank=True,max_length=52)
     phone = models.CharField(_('Number phone'),null=True,blank=True,max_length=11)
     gender = models.CharField(_('Gender'),null=False,max_length=7,choices=GENDER_CHOICES,default=OTRO)
@@ -59,7 +59,7 @@ class User(AbstractBaseUser,PermissionsMixin):
 
     objects = UserManager()
 
-    REQUIRED_FIELDS = ('first_name','last_name','birthday','address','phone','gender','country')
+    REQUIRED_FIELDS = ('first_name','last_name','birthdate','address','phone','gender','country')
     USERNAME_FIELD = 'email'
 
     class Meta:

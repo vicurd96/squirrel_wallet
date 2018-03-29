@@ -4,7 +4,7 @@ from django.conf.urls import url, include
 from wallet.views import *
 from django.contrib.auth import *
 from two_factor.urls import urlpatterns as tf_urls
-from two_factor.views import (BackupTokensView, DisableView, PhoneDeleteView, PhoneSetupView,
+from two_factor.views import (LoginView,BackupTokensView, DisableView, PhoneDeleteView, PhoneSetupView,
 ProfileView, QRGeneratorView, SetupCompleteView, SetupView,)
 
 user_urls = [
@@ -12,7 +12,7 @@ user_urls = [
     path('signup/',view=SignUp.as_view(),name='signup'),
     path('dashboard',view=Dashboard.as_view(),name='dashboard'),
     ]
-two_factor = [
+two_factor = ([
     path(
         'account/two_factor/setup/',
         view=SetupView.as_view(),
@@ -53,7 +53,7 @@ two_factor = [
         view=DisableView.as_view(),
         name='disable',
     ),
-]
+],'two_factor')
 
 urlpatterns = [
     path('',include(user_urls)),

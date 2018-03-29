@@ -49,7 +49,7 @@ INSTALLED_APPS = [
 
 AUTH_USER_MODEL = 'wallet.User'
 LOGIN_URL = 'wallet:login'
-LOGIN_REDIRECT_URL = '/wallet/dashboard/'
+LOGIN_REDIRECT_URL = '/wallet/dashboard'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
