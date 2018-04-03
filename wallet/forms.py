@@ -2,6 +2,32 @@ from django import forms
 from .models import *
 from django_countries.fields import CountryField
 from django.utils.translation import gettext as _
+from bit import Key, PrivateKeyTestnet
+from Ethereum import *
+import uuid
+
+class CreateWalletForm(forms.ModelForm):
+    password = forms.CharField(label=_("Password"),widget=forms.PasswordInput)
+
+    class Meta:
+        model = User
+        fields = ('password', )
+
+    def clean(self):
+        cleaned_data = super(ConfirmPasswordForm, self).clean()
+        password = cleaned_data.get('password')
+        if not check_password(password, self.instance.password):
+            self.add_error('password', 'Password does not match.')
+
+    def save(self, commit=True):
+        user = super(ConfirmPasswordForm, self).save(commit)
+        if commit:
+            ETH = Currency.objects.filter(abrev='ETH')
+            key = Ethereum.generate_address()
+            w = Wallet(key['address'],key['private_key'],user,ETH.id,0)
+            user.save()
+            w.save()
+        return user
 
 class UserCreationForm(forms.ModelForm):
     error_messages = {
@@ -15,7 +41,7 @@ class UserCreationForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ('email','password1','password2','first_name','last_name','gender','birthdate','country','address','phone')
+        fields = ('email','password1','password2','first_name','last_name')
 
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")
@@ -31,5 +57,14 @@ class UserCreationForm(forms.ModelForm):
         user = super(UserCreationForm, self).save(commit=False)
         user.set_password(self.cleaned_data["password1"])
         if commit:
+            BTC = Currency.objects.filter(abrev='BTC').get()
+            key = PrivateKeyTestnet()
+            w = Wallet(key.address,key.to_wif(),user,BTC.id,key.balance)
             user.save()
+            w.save()
         return user
+
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = ('gender','birthdate','country','address','phone')

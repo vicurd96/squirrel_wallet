@@ -1,4 +1,3 @@
-{% extends "base_generic.html" %}
 
 {% block content %}
 
@@ -15,7 +14,7 @@
     {% endif %}
 {% endif %}
 
-<form method="post" action="{% url 'login' %}">
+<form method="post" action="{% url 'auth_login' %}">
 {% csrf_token %}
 
 <div>
@@ -34,6 +33,6 @@
 </form>
 
 {# Assumes you setup the password_reset view in your URLconf #}
-<p><a href="{% url 'password_reset' %}">Lost password?</a></p>
+<p><a href="{% url 'auth_password_reset' %}">Lost password?</a></p>
 
 {% endblock %}

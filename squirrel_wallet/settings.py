@@ -31,24 +31,38 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'django.contrib.admin',
-    'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'django.contrib.sites',
     'django.contrib.staticfiles',
-    'rest_framework',
-    'django_filters',
-    'django_countries',
+    'registration',
+    'django.contrib.auth',
     'wallet',
     'django_extensions',
-    'django_otp',
-    'django_otp.plugins.otp_static',
-    'django_otp.plugins.otp_totp',
-    'two_factor',
+    #'django_otp',
+    #'django_otp.plugins.otp_static',
+    #'django_otp.plugins.otp_totp',
+    #'two_factor',
 ]
 
+SITE_ID = 1
+
+ACCOUNT_ACTIVATION_DAYS = 7
+REGISTRATION_FORM = 'wallet.forms.UserCreationForm'
+INCLUDE_REGISTER_URL = True
+BTC_API_CODE = '859fbadc-c689-44e3-9e9e-11752cf3b694'
+BTC_HOST = 'http://localhost:3000/'
+ETH_API_URL = 'https://ropsten.infura.io/fUqOLl4vcq3KeYZG0KQt'
+
+AUTHENTICATION_BACKENDS = (
+    'wallet.backends.EmailOrUUIDModelBackend',
+    'django.contrib.auth.backends.ModelBackend'
+)
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
 AUTH_USER_MODEL = 'wallet.User'
-LOGIN_URL = 'wallet:login'
+LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/wallet/dashboard'
 
 MIDDLEWARE = [
@@ -57,7 +71,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django_otp.middleware.OTPMiddleware',
+    #'django_otp.middleware.OTPMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]

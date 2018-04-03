@@ -1,11 +1,11 @@
-blockchain==1.4.0
-blockcypher==1.0.73
+bit==0.4.3
 django==2.0.3
 django-countries==5.1.1
-djangorestframework==3.7.7
 web3==3.16.5
 psycopg2==2.7.4
 psycopg2-binary==2.7.4
 django-filter==1.1.0
 django-extensions==2.0.6
-django-two-factor-auth==1.7.0
+ethereum==2.3.1
+django-otp==0.4.3
+django-registration-redux==2.2

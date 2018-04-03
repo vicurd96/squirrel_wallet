@@ -4,6 +4,9 @@ from django_countries.fields import CountryField
 from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import gettext as _
+from django.dispatch import receiver
+from django.db.models.signals import post_save
+from django.core.mail import send_mail
 import uuid
 
 class UserManager(BaseUserManager):
@@ -32,23 +35,10 @@ class UserManager(BaseUserManager):
         return self._create_user(email, password, **extra_fields)
 
 class User(AbstractBaseUser,PermissionsMixin):
-    HOMBRE = 'Male'
-    MUJER = 'Female'
-    OTRO = 'Unknown'
-    GENDER_CHOICES = (
-        (HOMBRE,'Male'),
-        (MUJER,'Female'),
-        (OTRO,'Unknown')
-    )
-    id = models.UUIDField(primary_key=True,unique=True, default=uuid.uuid4,editable=False)
+    id = models.UUIDField(default=uuid.uuid4,editable=False)
     first_name = models.CharField(_('First name'),null=False,blank=False,max_length=20)
     last_name = models.CharField(_('Last name'),null=False,blank=False,max_length=20)
-    email = models.EmailField(_('Email'),unique=True,null=False,blank=False)
-    birthdate = models.DateField(_('Birthdate'),null=False,blank=False)
-    address = models.CharField(_('Address'),null=True,blank=True,max_length=52)
-    phone = models.CharField(_('Number phone'),null=True,blank=True,max_length=11)
-    gender = models.CharField(_('Gender'),null=False,max_length=7,choices=GENDER_CHOICES,default=OTRO)
-    country = CountryField(_('Country'),null=False,blank_label='(Select country)')
+    email = models.EmailField(_('Email'),primary_key=True,unique=True,null=False,blank=False)
     is_staff = models.BooleanField(_('staff status'), default=False,
         help_text=_('Designates whether the user can log into this admin '
                     'site.'))
@@ -59,7 +49,7 @@ class User(AbstractBaseUser,PermissionsMixin):
 
     objects = UserManager()
 
-    REQUIRED_FIELDS = ('first_name','last_name','birthdate','address','phone','gender','country')
+    REQUIRED_FIELDS = ('first_name','last_name')
     USERNAME_FIELD = 'email'
 
     class Meta:
@@ -76,6 +66,27 @@ class User(AbstractBaseUser,PermissionsMixin):
     def email_user(self, subject, message, from_email=None, **kwargs):
         send_mail(subject, message, from_email, [self.email], **kwargs)
 
+class Profile(models.Model):
+    HOMBRE = 'Male'
+    MUJER = 'Female'
+    OTRO = 'Unknown'
+    GENDER_CHOICES = (
+        (HOMBRE,'Male'),
+        (MUJER,'Female'),
+        (OTRO,'Unknown')
+    )
+    user = models.OneToOneField('User',on_delete=models.CASCADE)
+    birthdate = models.DateField(_('Birthdate'),null=True,blank=False)
+    address = models.CharField(_('Address'),null=True,blank=True,max_length=52)
+    phone = models.CharField(_('Number phone'),null=True,blank=True,max_length=11)
+    gender = models.CharField(_('Gender'),null=True,max_length=7,choices=GENDER_CHOICES,default=OTRO)
+    country = CountryField(_('Country'),null=True,blank_label='(Select country)')
+
+    @receiver(post_save, sender=User)
+    def create_user_profile(sender, instance, created, **kwargs):
+        if created:
+            Profile.objects.create(user=instance)
+
 class Currency(models.Model):
     abrev = models.CharField(null=False,unique=True,max_length=3)
     name = models.CharField(null=False,unique=False,max_length=20)
@@ -87,7 +98,6 @@ class Value(models.Model):
 
 class Wallet(models.Model):
     address = models.CharField(primary_key = True,max_length=64)
-    public_key = models.CharField(null=False,unique=True,max_length=64)
     private_key = models.CharField(null=False,unique=True,max_length=64)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
     currency = models.ForeignKey('Currency', on_delete=models.PROTECT)
