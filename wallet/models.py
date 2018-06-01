@@ -9,6 +9,57 @@ from django.db.models.signals import post_save
 from django.core.mail import send_mail
 import uuid
 
+from fernet_fields import EncryptedCharField
+from bit import PrivateKeyTestnet
+from bit.network import get_fee, get_fee_cached, NetworkAPI
+from Ethereum import *
+import rlp
+
+class TransactionManager(models.Manager):
+    use_in_migrations = True
+
+    def _create(self,wallet,to,amount,fee):
+        status = False
+        now = timezone.now()
+        wallet = self.model(wallet=wallet,
+                            to=to,
+                            status=status,
+                            amount=amount,
+                            fee=fee,
+                            created_at=now,
+                            )
+        wallet.save(using=self._db)
+        return wallet
+
+    def create(self,wallet,to,amount,fee):
+        return self._create(wallet,to,amount,fee)
+
+class WalletManager(models.Manager):
+    use_in_migrations = True
+
+    def _create(self,address,private_key,user,currency,balance):
+        if not user:
+            raise ValueError('The given user must be set')
+        if not currency:
+            raise ValueError('The given currency must be set')
+        now = timezone.now()
+        wallet = self.model(address=address,
+                            private_key=private_key,
+                            user=user,
+                            currency=currency,
+                            balance=balance,
+                            created_at=now,
+                            )
+        wallet.save(using=self._db)
+        return wallet
+
+    def create(self,user,currency):
+        balance = 0
+        key = PrivateKeyTestnet()
+        address = key.address
+        private_key = key.to_wif()
+        return self._create(address,private_key,user,currency,balance)
+
 class UserManager(BaseUserManager):
     use_in_migrations = True
     def _create_user(self, email, password, **extra_fields):
@@ -76,36 +127,69 @@ class Profile(models.Model):
         (OTRO,'Unknown')
     )
     user = models.OneToOneField('User',on_delete=models.CASCADE)
-    birthdate = models.DateField(_('Birthdate'),null=True,blank=False)
+    birthdate = models.DateField(_('Birthdate'),null=True,blank=True)
     address = models.CharField(_('Address'),null=True,blank=True,max_length=52)
     phone = models.CharField(_('Number phone'),null=True,blank=True,max_length=11)
     gender = models.CharField(_('Gender'),null=True,max_length=7,choices=GENDER_CHOICES,default=OTRO)
-    country = CountryField(_('Country'),null=True,blank_label='(Select country)')
+    country = CountryField(_('Country'),null=True,blank_label='')
+    last_update = models.DateTimeField(_('Last update'),auto_now=True)
 
     @receiver(post_save, sender=User)
     def create_user_profile(sender, instance, created, **kwargs):
         if created:
             Profile.objects.create(user=instance)
 
+    @receiver(post_save, sender=User)
+    def save_user_profile(sender, instance, **kwargs):
+        instance.profile.save()
+
 class Currency(models.Model):
     abrev = models.CharField(null=False,unique=True,max_length=3)
     name = models.CharField(null=False,unique=False,max_length=20)
+    api = models.CharField(null=False,unique=False,max_length=256)
 
 class Value(models.Model):
-    date = models.DateTimeField(auto_now_add=True)
-    currency = models.ForeignKey('Currency',on_delete=models.PROTECT)
+    date = models.DateField(auto_now_add=True)
     value = models.DecimalField(max_digits=16, decimal_places=4,default=0)
 
 class Wallet(models.Model):
     address = models.CharField(primary_key = True,max_length=64)
-    private_key = models.CharField(null=False,unique=True,max_length=64)
+    private_key = EncryptedCharField(null=False,max_length=64)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
     currency = models.ForeignKey('Currency', on_delete=models.PROTECT)
     balance = models.DecimalField(max_digits=16, decimal_places=8,default=0)
+    created_at = models.DateTimeField(_('Created at'),auto_now_add=True)
+    last_update = models.DateTimeField(_('Last update'),auto_now_add=False)
+
+    objects = WalletManager()
+
+class Transaction(models.Model):
+    IN = 'IN'
+    OUT = 'OUT'
+    TX_CHOICES = (
+        ('IN',IN),
+        ('OUT',OUT),
+    )
+    txid = models.CharField(_('TXID'),null=True,max_length=256)
+    wallet = models.ForeignKey(_('Wallet'),'Wallet',on_delete=models.PROTECT)
+    to = models.CharField(_('To address'),null=False,max_length=64)
+    status = models.NullBooleanField(_('Status'),default=False)
+    created_at = models.DateTimeField(_('Created at'),auto_now_add=True)
+    type = models.CharField(_('Type'),max_length=3,choices=TX_CHOICES,default=OUT)
+    amount = models.DecimalField(_('Amount'),null=True,max_digits=16,decimal_places=8)
+    fee = models.DecimalField(_('Fee'),null=True,max_digits=16,decimal_places=8)
 
 class Operation(models.Model):
-    txid = models.CharField(null=False,unique=True,max_length=64)
-    wallet = models.ForeignKey('Wallet',on_delete=models.PROTECT)
-    to = models.CharField(null=False,unique=True,max_length=64)
-    status = models.NullBooleanField(default=None)
-    quantity = models.DecimalField(max_digits=16,decimal_places=8)
+    PASS = _('Password change')
+    SEC = _('2-pass authenticator configured')
+    TX = _('Cryptocurrency transaction')
+    UPDATE = _('Updated profile')
+    OPERATION_CHOICES = (
+        ('password',PASS),
+        ('update',UPDATE),
+        ('security',SEC),
+        ('TX',TX),
+    )
+    user = models.ForeignKey('User',on_delete=models.PROTECT)
+    type = models.CharField(null=True,max_length=8,choices=OPERATION_CHOICES)
+    created_at = models.DateTimeField(_('Created at'),auto_now_add=True)

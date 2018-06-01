@@ -1,0 +1,54 @@
+{% extends 'header.html' %}
+{% load static %}
+{% load i18n %}
+{% load qr_tags %}
+{% block content %}
+<div class="row">
+    <div class="row"></div>
+    <div class="col l5 push-l3">
+    <center>
+	<div class="card large">
+        <div class="card-tabs">
+           <ul class="tabs tabs-fixed-width">
+             <li class="tab"><a class="active", href="#receive">Send</a></li>
+             <li class="tab"><a href="#send">Receive</a></li>
+           </ul>
+        </div>
+       <div class="card-content">
+           <div id=receive>
+                {% for wallet in wallet %}
+                    {% qr_from_text wallet.address "m" %}
+                {% endfor %}
+        	    <div class="row">
+                    <div class="input-field col s12">
+                    {% for wallet in wallet %}
+                        <input value="{{ wallet.address }}" id="address" type="text" class="validate">
+                        <label class="active" for="address">Address</label>
+                    {%endfor%}
+                    </div>
+                </div>
+            </div>
+            <div id=send>
+                <form method="POST">{% csrf_token %}
+                 {% for field in form %}
+                  <div class="input-field col s12">
+                     {{ field }}
+                 <label for="{{field.label}}">{{field.label}}</label>
+                 </div>
+                 {%endfor%}
+                 <button type="submit" class="btn btn-default waves-effect amber darken-3" >{% trans 'Transact' %}</button>
+                 </form>
+             </div>
+        </div>
+    </div>
+    </center>
+    </div>
+</div>
+{% endblock %}
+
+<script>
+  $(document).ready(function(){
+    $('.tabs').tabs();
+  });
+
+</script>

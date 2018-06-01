@@ -29,6 +29,8 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
+USE_L10N = False
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.contenttypes',
@@ -40,10 +42,13 @@ INSTALLED_APPS = [
     'django.contrib.auth',
     'wallet',
     'django_extensions',
-    #'django_otp',
-    #'django_otp.plugins.otp_static',
-    #'django_otp.plugins.otp_totp',
-    #'two_factor',
+    'chartit',
+    'django_otp',
+    'django_otp.plugins.otp_static',
+    'django_otp.plugins.otp_totp',
+    'two_factor',
+    'qrcode',
+    'django_countries',
 ]
 
 SITE_ID = 1
@@ -51,19 +56,46 @@ SITE_ID = 1
 ACCOUNT_ACTIVATION_DAYS = 7
 REGISTRATION_FORM = 'wallet.forms.UserCreationForm'
 INCLUDE_REGISTER_URL = True
-BTC_API_CODE = '859fbadc-c689-44e3-9e9e-11752cf3b694'
-BTC_HOST = 'http://localhost:3000/'
-ETH_API_URL = 'https://ropsten.infura.io/fUqOLl4vcq3KeYZG0KQt'
+MIN_BTC_TX = 0.00000547
 
 AUTHENTICATION_BACKENDS = (
     'wallet.backends.EmailOrUUIDModelBackend',
     'django.contrib.auth.backends.ModelBackend'
 )
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'squirrelwalletlicom@gmail.com'
+EMAIL_HOST_PASSWORD = 'faltoco2018'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
 
 AUTH_USER_MODEL = 'wallet.User'
-LOGIN_URL = '/accounts/login/'
+LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = '/wallet/dashboard'
+
+JET_DEFAULT_THEME = 'light-gray'
+
+DATE_INPUT_FORMATS = ('%m-%d-%Y','%Y-%m-%d')
+
+CELERY_BROKER_URL = 'redis://localhost:6379'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'America/Caracas'
+CELERY_BEAT_SCHEDULE = {
+    'update_values': {
+        'task': 'wallet.tasks.update_values',
+        'schedule': 60.00,
+    },
+    'update_transactions': {
+        'task': 'wallet.tasks.update_transactions',
+        'schedule': 60.00,
+    },
+    'update_balances': {
+        'task': 'wallet.tasks.update_balances',
+        'schedule': 30.00,
+    },
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -71,7 +103,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    #'django_otp.middleware.OTPMiddleware',
+    'django_otp.middleware.OTPMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -105,7 +137,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'squirrel_wallet',
         'USER': 'postgres',
-        'PASSWORD': '26191477',
+        'PASSWORD': 'licom2018',
         'HOST': '127.0.0.1',
         'PORT': '5432',
     }
@@ -136,7 +168,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Caracas'
 
 USE_I18N = True
 
@@ -147,5 +179,9 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),
+]
 
 STATIC_URL = '/static/'

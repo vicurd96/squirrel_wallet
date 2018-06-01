@@ -1,0 +1,44 @@
+{% extends 'header.html' %}
+{% load i18n %}
+{% block content %}
+<div class="container">
+    <div class="card large col l8 push-l2">
+        <div class="card-content">
+            <div class="card-title">
+                {% if tx.type == 'IN' %}
+                <span class="badge green lighten-2 white-text">IN</span>
+                {% else %}
+                <span class="badge red lighten-2 white-text">OUT</span>
+                {% endif %}
+                <h5>{% block title %}{% trans "Transaction info" %}{% endblock %}
+</h5></div>
+            <div class="divider"></div>
+                    </div>
+                <ul class="collection">
+                    <li class="collection-item avatar">
+                        <span class="title grey-text text-darken-4">{% trans 'Transaction ID:' %}</span>
+                        <i class="material-icons circle blue">payment</i><div>{{ tx.txid }}</div>
+                    </li>
+                    <li class="collection-item avatar">
+                        <span class="title grey-text text-darken-4">{% trans 'Exchange:' %}</span>
+                        <i class="fas fa-exchange-alt circle red"></i><div>
+                            {% if tx.wallet %}
+                                {{ tx.wallet.address }}
+                            {% else %}
+                                {% trans 'Unknown' %}
+                            {% endif %}
+                            <i class="fas fa-long-arrow-alt-right"></i> {{ tx.to}}</div>
+                    </li>
+                    <li class="collection-item avatar">
+                        <span class="title grey-text text-darken-4">{% trans 'Status:' %}</span>
+                        {% if tx.status %} <i class="material-icons circle green">done_all</i><div>{% trans 'Processed' %} {% else %}<i class="material-icons circle yellow">done</i><div> {% trans 'Pending' %} {% endif %}</div>
+                    </li>
+                    <li class="collection-item avatar">
+                        <span class="title grey-text text-darken-4">{% trans 'Amount:' %}</span>
+                        {% if tx.amount %} <i class="material-icons circle green lighten-3">attach_money</i><div>{{ tx.amount }} {% else %}<i class="material-icons circle grey">attach_money</i><div> {% trans 'Unknown' %} {% endif %}</div>
+                    </li>
+                </ul>
+                <div class="right-align black-text">Checked at: {{ tx.created_at }}</span>
+    </div>
+</div>
+{% endblock %}

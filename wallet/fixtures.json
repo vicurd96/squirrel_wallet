@@ -1,0 +1,18 @@
+[
+  {
+    "model": "wallet.Currency",
+    "pk": 1,
+    "fields": {
+      "abrev": "BTC",
+      "name": "Bitcoin"
+    }
+  },
+  {
+    "model": "wallet.Currency",
+    "pk": 2,
+    "fields": {
+        "abrev": "ETH",
+        "name": "Ethereum"
+    }
+  }
+]

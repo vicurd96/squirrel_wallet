@@ -1,0 +1,51 @@
+{% load static %}
+{% load countries %}
+{% load i18n %}
+
+{% block content %}
+{% for form in forms %}
+    {% if forloop.counter0 == 2 %}
+    <form method="post"> {% csrf_token %}
+        {% for field in form %}
+        <div class="input-field col s6">
+            {{ field }}
+            <label for="{{ field.label }}">{{ field.label }}</label>
+        </div>
+        {% endfor %}
+        <div class="row center-align">
+    	 <input type="hidden" name="selected_form" value="{{ forloop.counter0 }}">
+          <button class="waves-effect waves-teal btn-flat" type="submit">{% trans 'Submit' %}</button>
+        </div>
+    </form>
+    {% endif %}
+    {% if forloop.counter0 == 3 %}
+    <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+        {% if field.name == 'password' or field.name == 'address' %}
+         <div class="input-field col s12">
+        {% else %}
+        <div class="input-field col s6">
+        {% endif %}
+            {{ field }}
+            <label for="{{ field.label }}">{{ field.label }}</label>
+        </div>
+        {% endfor %}
+        <div class="row center-align">
+    	 <input type="hidden" name="selected_form" value="{{ forloop.counter0 }}">
+          <button class="waves-effect waves-teal btn-flat" type="submit">{% trans 'Submit' %}</button>
+        </div>
+    </form>
+    {% endif %}
+{% endfor %}
+
+<script>
+$(document).ready(function(){
+    $('select').formSelect();
+  });
+  $(document).ready(function(){
+    $('.datepicker').datepicker({ 'yearRange': 100, 'format':'mm-dd-yyyy' });
+  });
+
+</script>
+{% endblock %}

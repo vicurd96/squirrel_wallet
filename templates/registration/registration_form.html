@@ -1,10 +1,121 @@
-{% block title %}Sign Up{% endblock %}
-
+{% extends 'header2.html' %}
+{% load i18n  %}
 {% block content %}
-  <h2>Sign up</h2>
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Next</button>
-  </form>
+<script>
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+var csrftoken = getCookie('csrftoken');
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});
+
+$(document).ready(function () {
+    $("#registrationform").materialvalidation({
+        theme: "materialize"
+    });
+    var $myForm = $("#registrationform")
+    $("#registrationform").submit(function (evt) {
+        evt.preventDefault();
+        evt.stopPropagation();
+        if ($("#registrationform").data().materialvalidation.methods.validate()) {
+            var $formData = $(this).serialize()
+            var $thisURL = $myForm.attr('data-url') || window.location.href
+            $.ajax({
+                method: "POST",
+                url: $thisURL,
+                data: $formData,
+                success: function(){
+                    window.location.href = "{% url 'registration_complete' %}"
+                },
+                error: handleFormError,
+            })
+        }
+        return false
+    });
+    function handleFormSuccess(data, textStatus, jqXHR){
+        console.log(data)
+        console.log(textStatus)
+        console.log(jqXHR)
+    }
+
+    function handleFormError(jqXHR, textStatus, errorThrown){
+        console.log(jqXHR)
+        console.log(textStatus)
+        console.log(errorThrown)
+    }
+});
+</script>
+
+<div class="section">
+</div>
+<div class="container">
+    <div class="section">
+        <div class="row">
+            <div class="card large col l6 push-l3">
+        		<div class="card-content">
+        			<form id="registrationform" action="{% url 'registration_complete' %}" data-url='{{ request.build_absolute_uri|safe }}' novalidate>
+                        {% csrf_token %}
+                        {% for hidden_field in form.hidden_fields %}
+                        {{ hidden_field }}
+                        {% endfor %}
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger" role="alert">
+                          {% for error in form.non_field_errors %}
+                            {{ error }}
+                          {% endfor %}
+                        </div>
+                        {% endif %}
+                        <div class="row">
+                        {% for field in form.visible_fields %}
+                        {% if field.name == 'email' %}
+                        <div class="input-field col l12">
+                        {% else %}
+                        <div class="input-field inline col l6">
+                        {% endif %}
+                            {{ field }}
+                            <label for="{{ field.name }}">{{ field.label }}
+                            {% if field.help_text %}
+
+                            {% endif %}
+                        </div>
+                         {% endfor %}
+                        </div>
+        				<div class="input-field col s12">
+        					<center><label><input id="checkbox" name="checkbox" type="checkbox" required/><span>{% trans 'I accept the terms and conditions'%}</span></label></center>
+                            <br/>
+                            <div class="section">
+                            <center><button name="register" id="register" type="submit" class="btn waves-effect amber" >{% trans 'Register' %}</button></center>
+                            </div>
+                            <input type="hidden" name="next" value="{% trans 'Submit' %}" />
+                        </div>
+                    </form>
+        		</div>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}

@@ -1,0 +1,133 @@
+{% extends 'header.html' %}
+{% load static %}
+{% block content %}
+{% load chartit %}
+{% load i18n %}
+{{ linechart|load_charts:"chartbtc,charteth,btctxcount,ethtxcount" }}
+  <div class="section amber darken-1 white-text">
+    {% if has_wallet %}
+    <h1 class="center-align">{% trans 'Welcome back, ' %} {{ user.get_short_name }}!</h1>
+    {% else %}
+    <h1 class="center-align">{% trans 'Welcome, ' %} {{ user.get_short_name }}</h1>
+    <h3 class="center-align">{% trans 'We are glad you chose us!' %}</h3>
+    <h5 class="center-align">{% trans "You haven't created a wallet yet, want to try it?" %}</h5>
+    <br>
+    <center><a class="waves-effect waves-light btn btn-large grey darken-3 modal-trigger" href="#cwmodal"><i class="material-icons left">attach_money</i>Create your wallet now!</a></center>
+    {% endif %}
+    </div>
+<div class="section">
+<div class="row col s12 l6">
+<div class="card large" id="chart">
+    <div class="card-tabs">
+      <ul class="tabs tabs-fixed-width">
+        <li class="tab"><a class="active" href="#chartbtc">Bitcoin - USD</a></li>
+        <li class="tab"><a href="#charteth">Ether - USD</a></li>
+      </ul>
+    </div>
+    <div class="card-content" style="display:block">
+        <div id="chartbtc"></div>
+        <div id="charteth"></div>
+    </div>
+</div>
+</div>
+<div class="row col s12 l6">
+<div class="card large">
+    <div class="card-tabs">
+        <ul class="tabs tabs-fixed-width">
+            <li class="tab"><a class="active" href="#btctxcount">Bitcoin # TX </a></li>
+            <li class="tab"><a href="#ethtxcount">Ethereum # TX</a></li>
+        </ul>
+    </div>
+    <div class="card-content">
+        <div id="btctxcount"></div>
+        <div id="ethtxcount"></div>
+    </div>
+</div>
+</div>
+<div class="row col s6 l6">
+<div class="card large">
+    <div class="row">
+        <div class="card-content">
+            <span class="card-title">Bitcoin information</span>
+            {% if has_wallet and has_btc %}
+            <div class="divider"></div>
+            <div class="section"></div>
+                <ul class="collection">
+                    <li class="collection-item avatar">
+                    <span class="title grey-text text-darken-4">{% trans "Your balance:" %} </span>
+                        <i class="fab fa-btc circle amber"></i><div>{{ balance_btc|floatformat:2 }} bitcoins</div>
+                    </li>
+                    <li class="collection-item avatar"><span class="title grey-text text-darken-4">{% trans "Regular fee: "%}</span>
+                        <i class="material-icons circle blue">attach_money</i><div>{{ fee }} satoshis</div>
+                    </li>
+                    <li class="collection-item avatar"><span class="title grey-text text-darken-4">{% trans "Value in dollars: "%}</span>
+                        <i class="fas fa-hand-holding-usd circle green"></i><div>{{ btc_to_usd|floatformat:2 }} USD$ p/BTC</div>
+                    </li>
+                    <li class="collection-item avatar"><span class="title grey-text text-darken-4">{% trans "Value in euros: "%}</span>
+                        <i class="fas fa-euro-sign circle red"></i><div>{{ btc_to_eur|floatformat:2 }} EUR₵ p/BTC</div>
+                    </li>
+                </ul>
+            {% else %}
+                <div class="divider"></div>
+                <br><br>
+                <center><i class="amber-text fab fa-btc fa-10x"></i></center>
+                <br><br>
+                <center><a class=" waves-effect waves-light btn btn-large amber darken-1" href="{% url 'bitcoincreate' %}">Create your wallet</a></center>
+            {% endif %}
+        </div>
+    </div>
+</div>
+</div>
+<div class="row col s6 l6">
+<div class="card large">
+    <div class="card-content">
+        <span class="card-title right-align">Ether information</span>
+        {% if has_wallet and has_eth %}
+        <div class="divider"></div>
+        <div class="section"></div>
+        <ul class="collection">
+            <li class="collection-item avatar">
+            <span class="title grey-text text-darken-4">{% trans "Your balance:" %} </span>
+                <i class="fab fa-ethereum circle grey darken-2"></i><div>{{ balance_eth|floatformat:2 }} ethers</div>
+            </li>
+            <li class="collection-item avatar"><span class="title grey-text text-darken-4">{% trans "Regular gas price: "%}</span>
+                <i class="material-icons circle blue">attach_money</i><div>{{ gas_price }} ethers</div>
+            </li>
+            <li class="collection-item avatar"><span class="title grey-text text-darken-4">{% trans "Value in dollars: "%}</span>
+                <i class="fas fa-hand-holding-usd circle green"></i><div>{{ eth_to_usd|floatformat:2 }} USD$ p/ETH</div>
+            </li>
+            <li class="collection-item avatar"><span class="title grey-text text-darken-4">{% trans "Value in euros: "%}</span>
+                <i class="fas fa-euro-sign circle red"></i><div>{{ eth_to_eur|floatformat:2 }} EUR₵ p/ETH</div>
+            </li>
+        </ul>
+        {% else %}
+            <div class="divider"></div>
+            <br><br>
+            <center><i class="grey-text text-darken-3 fab fa-ethereum fa-10x"></i></center>
+            <br><br>
+            <center><a class=" waves-effect waves-light btn btn-large grey darken-3" href="{% url 'ethereumcreate' %}">Create your wallet</a></center>
+        {% endif %}
+    </div>
+</div>
+</div>
+</div>
+
+<style>
+.tabs .tab a{
+    color:#bdbdbd;
+}
+.tabs .tab a:hover,.tabs .tab a.active {
+	background-color:transparent;
+	color:#ffc107;
+}
+.tabs .tab.disabled a,.tabs .tab.disabled a:hover {
+	color:rgba(102,147,153,0.7);
+}
+.tabs .indicator {
+	background-color:#ffc107;
+}
+</style>
+
+{% csrf_token %}
+{% include 'btctx.html' %}
+{% endblock %}

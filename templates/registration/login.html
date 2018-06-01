@@ -1,38 +1,55 @@
-
+{% extends 'header2.html' %}
+{ % trans "Log into your account" as login_welcome %}
+{% load i18n two_factor %}
 {% block content %}
-
-{% if form.errors %}
-<p>Your username and password didn't match. Please try again.</p>
-{% endif %}
-
-{% if next %}
-    {% if user.is_authenticated %}
-    <p>Your account doesn't have access to this page. To proceed,
-    please login with an account that has access.</p>
-    {% else %}
-    <p>Please login to see this page.</p>
-    {% endif %}
-{% endif %}
-
-<form method="post" action="{% url 'auth_login' %}">
-{% csrf_token %}
-
-<div>
-  <td>{{ form.username.label_tag }}</td>
-  <td>{{ form.username }}</td>
+<div class="section">
 </div>
-<div>
-  <td>{{ form.password.label_tag }}</td>
-  <td>{{ form.password }}</td>
+<div class="section">
 </div>
-
-<div>
-  <input type="submit" value="login" />
-  <input type="hidden" name="next" value="{{ next }}" />
+<div class="container">
+    <div class="section">
+        <div class="row">
+            <div class="card medium col l4 push-l4">
+        		<div class="card-content">
+        			<form class="loginform" method="post">
+                        {% csrf_token %}
+                        {{ wizard.management_form }}
+                        {{ form.non_field_errors }}
+                        {% for field in wizard.form.visible_fields %}
+                        <div class="input-field col l12">
+                            {{ field.errors }}
+                            {{ field }}
+                            <label for="{{ field.name }}">{{ field.label_tag }}</label>
+                            {{ field.help_text }}
+                        </div>
+                        {% endfor %}
+                            {% if cancel_url %}
+                                <a href="{{ cancel_url }}" class="pull-right btn btn-link">{% trans "Cancel" %}</a>
+                            {% endif %}
+                            {% if wizard.steps.prev %}
+                                <button name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}" class="col s5 push-s0 btn btn-medium waves-effect amber">{% trans "Back" %}</button>
+                            {% else %}
+                                <button disabled name="" type="button" class="col s5 push-s0 btn btn-medium disabled">{% trans "Back" %}</button>
+                            {% endif %}
+                            {% if wizard.steps.prev %}
+                                <button type="submit" class="col s5 push-s2 btn btn-medium waves-effect amber">{% trans "Login" %}</button>
+                                <input type="hidden" name="next" value="{{ next }}" />
+                            {% else %}
+                                <button type="submit" class="col s5 push-s2 btn btn-medium waves-effect amber">{% trans "Login" %}</button>
+                            {% endif %}
+                        </div>
+        			</form>
+                    <div class="card-action">
+                    Don't have an account? <a href="{% url 'registration_register' %}">Create One</a>
+                    </div>
+        		</div>
+    	    </div>
+        </div>
+    </div>
 </div>
-</form>
-
-{# Assumes you setup the password_reset view in your URLconf #}
-<p><a href="{% url 'auth_password_reset' %}">Lost password?</a></p>
-
+<script>
+$(document).ready(function () {
+    $("#loginform").materialvalidation();
+});
+</script>
 {% endblock %}

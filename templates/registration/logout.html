@@ -1,0 +1,25 @@
+{% extends "header2.html" %}
+{% load i18n %}
+
+{% block content %}
+<div class="section">
+</div>
+<div class="section">
+</div>
+<div class="container">
+    <div class="section">
+        <div class="row">
+            <div class="card small col l4 push-l4">
+                <div class="card-content">
+                    <div class="card-title">{% trans 'Logged out'%}</div>
+                    <div class="divider"></div>
+                    <div class="card-content">
+                        <p class="center-align">{% trans "Successfully logged out" %}.</p>
+                    </div>
+                    <center><a class="btn btn-default waves-effect amber" href="{% url 'login' %}">{% trans 'Back to login' %}</a></center>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

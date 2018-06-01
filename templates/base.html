@@ -1,0 +1,42 @@
+ {% load static %}
+ {% load i18n %}
+{% trans "Login" as login_text %}
+{% trans "Sign up" as register_text %}
+<head>
+	<title>Squirrel Wallet</title>
+	<meta meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <!-- CSS Styles -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link type="text/css" rel="stylesheet" href="{% static 'css/materialize.min.css' %}"  media="screen,projection"/>
+  <link href="{% static 'css/my-login.css' %}" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
+  <!-- Javascript -->
+  <script src="{% static 'js/jquery.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/materialize.min.js' %}"></script>
+</head>
+<body>
+  <header>
+    <div class="navbar-fixed">
+      <nav>
+        <div class="nav-wrapper amber darken-3">
+          <a class="brand-logo" href="{% url 'login' %}" >Squirrel Wallet</a>
+          <ul class="right hide-on-med-and-down">
+            <li><a class="waves-effect waves-light btn grey darken-3" href="{% url 'login' %}"><i class="material-icons left">input</i>Login</a></li>
+            <li><a class="waves-effect waves-light btn grey darken-3" href="{% url 'registration_register' %}"><i class="material-icons left">people</i>Sign up</a></li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+  </header>
+  <div class="section">
+    <div class="container">
+      <div class="row">
+        <div class="card-wrapper">
+	         {% block content %}
+	         {% endblock %}
+        </div>
+      </div>
+    </div>
+  </div>
+</body>

@@ -1,0 +1,57 @@
+{% load static %}
+{% load i18n %}
+<div id="transactions" class="modal modal bottom-sheet">
+    <div class="modal-content">
+    {% if has_tx %}
+        <table class="table striped highlight responsive-table centered">
+            <thead>
+            <tr>
+              <th>#</th>
+              <th>{% trans 'Description' %}</th>
+              <th>{% trans 'Date' %}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for op in operations %}
+              <tr>
+                <td>{{ op.id }}</td>
+                {% if op.type == "Pass" %}
+                    <td>{% trans 'Password changed' %}</td>
+                {% elif op.type == 'Security' %}
+                    <td>{% trans '2-pass configured' %}</td>
+                {% elif op.type == 'TXBTC'}
+                    <td>{% trans 'Bitcoin transaction' %}</td>
+                {% else %}
+                    <td>{% trans 'Ethereum transaction' %}</td>
+                {% endif %}
+                <td>{{ op.created_at }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% if is_paginated %}
+          <ul class="pagination">
+            {% if page_obj.has_previous %}
+              <li><a href="?page={{ page_obj.previous_page_number }}">&laquo;</a></li>
+            {% else %}
+              <li class="disabled"><span>&laquo;</span></li>
+            {% endif %}
+            {% for i in paginator.page_range %}
+              {% if page_obj.number == i %}
+                <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+              {% else %}
+                <li><a href="?page={{ i }}">{{ i }}</a></li>
+              {% endif %}
+            {% endfor %}
+            {% if page_obj.has_next %}
+              <li><a href="?page={{ page_obj.next_page_number }}">&raquo;</a></li>
+            {% else %}
+              <li class="disabled"><span>&raquo;</span></li>
+            {% endif %}
+          </ul>
+        {% endif %}
+    {% else %}
+        <h5 class="center-align"> You have not transactions </h5>
+    {% endif %}
+    </div>
+</div>

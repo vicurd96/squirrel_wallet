@@ -1,0 +1,152 @@
+{% extends 'header.html' %}
+{% load static %}
+{% load i18n %}
+{% load qr_tags %}
+{% block content %}
+<div class="container">
+    <div class="card large col s12 m12 l12">
+        <div class="card-tabs">
+          <ul class="tabs tabs-fixed-width">
+            <li class="tab"><a class="active" href="#activity">Activity</a></li>
+            <li class="tab"><a href="#txs">Transactions</a></li>
+          </ul>
+        </div>
+        <br>
+        <div id="activity">
+            {% if Activity %}
+                <table class="table striped highlight responsive-table centered">
+                    <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>{% trans 'Description' %}</th>
+                      <th>{% trans 'Date' %}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for op in Activity %}
+                      <tr>
+                        <td>{{ op.id }}</td>
+                        {% if op.type == "Pass" %}
+                            <td>{% trans 'Password changed' %}</td>
+                        {% elif op.type == 'Security' %}
+                            <td>{% trans '2-pass configured' %}</td>
+                        {% elif op.type == 'TXBTC' or op.type == 'BTCTX' %}
+                            <td>{% trans 'Bitcoin transaction' %}</td>
+                        {% elif op.type == 'ETHTX' or op.type == 'TXETH' %}
+                            <td>{% trans 'Ethereum transaction' %}</td>
+                        {% else %}
+                            <td>{% trans 'Updated profile' %}</td>
+                        {% endif %}
+                        <td>{{ op.created_at }}</td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+                {% if Activity.has_next or Activity.has_previous %}
+                  <ul class="pagination center-align">
+                    {% if Activity.has_previous %}
+                      <li><a href="?page1={{ Activity.previous_page_number }}"><i class="material-icons">chevron_left</i></a></li>
+                    {% else %}
+                      <li class="disabled"><a href="#"><i class="material-icons">chevron_left</i></a></li>
+                    {% endif %}
+                    {% for i in Activity.paginator.page_range %}
+                      {% if Activity.number == i %}
+                        <li class="active red darken-1"><a href="#">{{ i }}</a></li>
+                      {% else %}
+                        <li><a class="waves-effect" href="?page1={{ i }}">{{ i }}</a></li>
+                      {% endif %}
+                    {% endfor %}
+                    {% if Activity.has_next %}
+                      <li><a href="?page1={{ Activity.next_page_number }}"><i class="material-icons">chevron_right</i></a></li>
+                    {% else %}
+                      <li class="disabled"><a href="#"><i class="material-icons">chevron_right</i></a></li>
+                    {% endif %}
+                  </ul>
+                 {% endif %}
+            {% else %}
+                <h5 class="center-align">{% trans 'You have not activity' %} </h5>
+            {% endif %}
+        </div>
+        <div id="txs">
+            {% if Tranx %}
+                <table class="table striped highlight responsive-table centered">
+                    <thead>
+                    <tr>
+                      <th>{% trans 'Transaction id' %}</th>
+                      <th>{% trans 'Description' %}</th>
+                      <th>{% trans 'Type' %}</th>
+                      <th>{% trans 'Amount' %}</th>
+                      <th>{% trans 'Date' %}</th>
+                      <th>{% trans 'Info' %}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for op in Tranx %}
+                      <tr>
+                        <td>{{ op.txid|truncatechars:30 }}</span></td>
+                        {% if op.gas %}
+                            <td>{% trans 'Ethereum transaction' %}</td>
+                        {% else %}
+                            <td>{% trans 'Bitcoin transaction' %}</td>
+                        {% endif %}
+                        {% if op.type == 'IN' %}
+                        <td><span class="white-text badge green">IN</span></td>
+                        {% else %}
+                        <td><span class="white-text badge red">OUT</span></td>
+                        {% endif %}
+                        <td>{{ op.amount|floatformat:3 }}</td>
+                        <td>{{ op.created_at }}</td>
+                        {% if op.gas %}
+                        <td><a href="{% url 'detail_ether' op.txid %}"<i class="material-icons">info</i></a>
+                        {% else %}
+                        <td><a href="{% url 'detail_bitcoin' op.txid %}"<i class="material-icons">info</i></a>
+                        {% endif %}
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+                {% if Tranx.has_next or Tranx.has_previous %}
+                  <ul class="pagination center-align">
+                    {% if Tranx.has_previous %}
+                      <li><a href="?page2={{ Tranx.previous_page_number }}"><i class="material-icons">chevron_left</i></a></li>
+                    {% else %}
+                      <li class="disabled"><a href="#"><i class="material-icons">chevron_left</i></a></li>
+                    {% endif %}
+                    {% for i in Tranx.paginator.page_range %}
+                      {% if Tranx.number == i %}
+                        <li class="active red darken-1"><a href="#">{{ i }}</a></li>
+                      {% else %}
+                        <li><a class="waves-effect" href="?page2={{ i }}">{{ i }}</a></li>
+                      {% endif %}
+                    {% endfor %}
+                    {% if Tranx.has_next %}
+                      <li><a href="?page2={{ Tranx.next_page_number }}"><i class="material-icons">chevron_right</i></a></li>
+                    {% else %}
+                      <li class="disabled"><a href="#"><i class="material-icons">chevron_right</i></a></li>
+                    {% endif %}
+                  </ul>
+                 {% endif %}
+            {% else %}
+                <h5 class="center-align">{% trans 'You have not transactions' %} </h5>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<style>
+.tabs .tab a{
+    color:#bdbdbd;
+}
+.tabs .tab a:hover,.tabs .tab a.active {
+	background-color:transparent;
+	color:#ffc107;
+}
+.tabs .tab.disabled a,.tabs .tab.disabled a:hover {
+	color:rgba(102,147,153,0.7);
+}
+.tabs .indicator {
+	background-color:#ffc107;
+}
+</style>
+{% csrf_token %}
+{% include 'btctx.html' %}
+{% endblock %}
