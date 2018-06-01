@@ -43,11 +43,6 @@ INSTALLED_APPS = [
     'wallet',
     'django_extensions',
     'chartit',
-    'django_otp',
-    'django_otp.plugins.otp_static',
-    'django_otp.plugins.otp_totp',
-    'two_factor',
-    'qrcode',
     'django_countries',
 ]
 
