@@ -1,0 +1,35 @@
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+<form enctype="multipart/form-data" id="profileform" method="post" data-url="{% url 'profile' user.pk %}" data-redirect="{% url 'settings' user.pk %}" novalidate>
+   {% csrf_token %}
+   {% for field in profile_form %}
+       {% if field.name == 'password' or field.name == 'address' %}
+       <div class="input-field col s12">
+           {{ field }}
+           <label for="{{ field.label }}">{{ field.label }}</label>
+       </div>
+        {% elif field.name == 'avatar' %}
+        <div class="file-field input-field">
+            <div class="btn btn-small purple accent-4">
+                <span>{% trans 'Avatar' %}</span>
+                {{ field }}
+            </div>
+           <!--<label for="{{ field.label }}">{{ field.label }}</label>-->
+            <div class="file-path-wrapper">
+                <input class="file-path validate" type="text" placeholder="{% trans 'Upload an image file for avatar' %}">
+            </div>
+       </div>
+       {% else %}
+       <div class="input-field col s6">
+           {{ field }}
+           <label for="{{ field.label }}">{{ field.label }}</label>
+       </div>
+       {% endif %}
+   {% endfor %}
+   <div class="row center-align">
+        <button class="waves-effect waves-teal btn-flat" type="submit">{% trans 'Submit' %}</button>
+   </div>
+</form>
+{% endblock %}
