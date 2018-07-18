@@ -1,6 +1,49 @@
 {% extends 'header2.html' %}
 {% load i18n  %}
 {% block content %}
+
+<div class="container" style="margin-top:3%;">
+  <div class="section">
+    <div class="row">
+      <div class="card large col l8 push-l2 purple accent-4">
+        <div class="card-content">
+          <form id="registrationform" action="{% url 'register' %}" data-url='{{ request.build_absolute_uri|safe }}' novalidate>
+            {% csrf_token %}
+            <div class="row">
+              {% for field in form.visible_fields %}
+                {% if field.name == 'email' %}
+                <div class="input-field col l12">
+                {% else %}
+                <div class="input-field col l6">
+                {% endif %}
+                    {% if field.name == 'email' %}
+                    <i class="white-text material-icons prefix">account_circle</i>
+                    {% elif field.name == 'first_name' or field.name == 'last_name' %}
+                    <i class="white-text material-icons prefix">people</i>
+                    {% elif field.name == 'password1' or field.name == 'password2' %}
+                    <i class="white-text material-icons prefix">enhanced_encryption</i>
+                    {% endif %}
+                    {{ field }}
+                    <label class="white-text" for="{{ field.name }}">{{ field.label }}</label>
+                    <span class="helper-text grey-text text-lighten-1" >{{ field.help_text }}</span>
+                </div>
+                {% endfor %}
+                </div>
+              <div class="row center">
+                <!--<a href="{% url 'login' %}"><button name="back" id="back" type="button" class="btn waves-effect grey col l6" >{% trans 'Login' %}</button></a>-->
+                <button name="register" id="register" type="submit" class="btn waves-effect red accent-2 col l6 push-l3" >{% trans 'Sign up' %}</button>
+              </div>
+              <div class="card-action white">
+              Do you have an account already? <a class="purple-text text-accent-4" href="{% url 'login' %}">Sign in</a>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 function getCookie(name) {
     var cookieValue = null;
@@ -48,74 +91,20 @@ $(document).ready(function () {
                 url: $thisURL,
                 data: $formData,
                 success: function(){
+                    M.toast({html: "Successfully registered!"})
+                    M.toast({html: "We've sent a message to your email, check it for activation."})
                     window.location.href = "{% url 'registration_complete' %}"
                 },
-                error: handleFormError,
+                error: function(response){
+                    Object.keys(response.responseJSON).forEach(function(key){
+                      M.toast({html: response.responseJSON[key]})
+                    });
+                },
             })
         }
         return false
     });
-    function handleFormSuccess(data, textStatus, jqXHR){
-        console.log(data)
-        console.log(textStatus)
-        console.log(jqXHR)
-    }
-
-    function handleFormError(jqXHR, textStatus, errorThrown){
-        console.log(jqXHR)
-        console.log(textStatus)
-        console.log(errorThrown)
-    }
 });
 </script>
-
-<div class="section">
-</div>
-<div class="container">
-    <div class="section">
-        <div class="row">
-            <div class="card large col l6 push-l3">
-        		<div class="card-content">
-        			<form id="registrationform" action="{% url 'registration_complete' %}" data-url='{{ request.build_absolute_uri|safe }}' novalidate>
-                        {% csrf_token %}
-                        {% for hidden_field in form.hidden_fields %}
-                        {{ hidden_field }}
-                        {% endfor %}
-                        {% if form.non_field_errors %}
-                        <div class="alert alert-danger" role="alert">
-                          {% for error in form.non_field_errors %}
-                            {{ error }}
-                          {% endfor %}
-                        </div>
-                        {% endif %}
-                        <div class="row">
-                        {% for field in form.visible_fields %}
-                        {% if field.name == 'email' %}
-                        <div class="input-field col l12">
-                        {% else %}
-                        <div class="input-field inline col l6">
-                        {% endif %}
-                            {{ field }}
-                            <label for="{{ field.name }}">{{ field.label }}
-                            {% if field.help_text %}
-
-                            {% endif %}
-                        </div>
-                         {% endfor %}
-                        </div>
-        				<div class="input-field col s12">
-        					<center><label><input id="checkbox" name="checkbox" type="checkbox" required/><span>{% trans 'I accept the terms and conditions'%}</span></label></center>
-                            <br/>
-                            <div class="section">
-                            <center><button name="register" id="register" type="submit" class="btn waves-effect amber" >{% trans 'Register' %}</button></center>
-                            </div>
-                            <input type="hidden" name="next" value="{% trans 'Submit' %}" />
-                        </div>
-                    </form>
-        		</div>
-            </div>
-        </div>
-    </div>
-</div>
 
 {% endblock %}

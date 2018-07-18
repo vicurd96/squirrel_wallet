@@ -42,8 +42,8 @@ INSTALLED_APPS = [
     'django.contrib.auth',
     'wallet',
     'django_extensions',
-    'chartit',
     'django_countries',
+    'imagekit'
 ]
 
 SITE_ID = 1
@@ -64,10 +64,8 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
 AUTH_USER_MODEL = 'wallet.User'
-LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = '/wallet/dashboard'
-
-JET_DEFAULT_THEME = 'light-gray'
+LOGIN_URL = '/account/login/'
+LOGIN_REDIRECT_URL = '/wallet/dashboard/'
 
 DATE_INPUT_FORMATS = ('%m-%d-%Y','%Y-%m-%d')
 
@@ -129,12 +127,12 @@ WSGI_APPLICATION = 'squirrel_wallet.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'django.db.backends.mysql',
         'NAME': 'squirrel_wallet',
-        'USER': 'postgres',
+        'USER': 'licom',
         'PASSWORD': 'licom2018',
         'HOST': '127.0.0.1',
-        'PORT': '5432',
+        'PORT': '3306',
     }
 }
 
@@ -180,3 +178,5 @@ STATICFILES_DIRS = [
 ]
 
 STATIC_URL = '/static/'
+
+

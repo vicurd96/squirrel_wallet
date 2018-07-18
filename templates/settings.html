@@ -1,38 +1,36 @@
 {% extends 'header.html' %}
 % load static %}
 {% load i18n %}
-{% load qr_tags %}
 {% block content %}
 <div class="container">
-
-    <div class="card large col s12 m12 l8 push-l2">
-        <div class="col s12">
-         <ul class="tabs">
-           <li class="tab col s4"><a class="active" href="#profile"><i class="material-icons">account_circle</i>Profile</a></li>
-           <li class="tab col s4"><a href="#pass"><i class="material-icons">vpn_key</i>Change password</a></li>
-           <li class="tab col s4"><a href="#passauth"><i class="material-icons">verified_user</i>2-pass auth</a></li>
-         </ul>
-       </div>
-       <div class="card-content">
-          <div id="profile">{% include 'user_profile.html' %}</div>
-          <div id="pass">{% include 'change_password.html' %}</div>
-          <div id="passauth">{% include 'two_factor/profile.html' %}</div>
+    <div class="section">
+        <div class="row">
+            <div class="col s12 m12 l8">
+                <div class="card large">
+                     <ul class="tabs">
+                         <li class="tab col s4">
+                             <a href="#profile">Edit profile</a>
+                         </li>
+                         <li class="tab col s4"><a href="#pass">Change password</a></li>
+                         <li class="tab col s4"><a href="#twofactor">2-pass authenticator</a></li>
+                     </ul>
+                   <div class="card-content">
+                       <div id="profile">{% include 'profile.html' %}</div>
+                       <div id="pass">{% include 'change_password.html' %}</div>
+                   </div>
+                </div>
+            </div>
+            <div class="col s12 m12 l4">
+                <div class="card large">
+                    <ul class="tabs tabs-fixed-width">
+                        <li class="tab"><a href="#yourprofile">Your profile</a></li>
+                    </ul>
+                    <div class="card-content">
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
-{% include 'btctx.html' %}
-<style>
-.tabs .tab a{
-    color:#bdbdbd;
-}
-.tabs .tab a:hover,.tabs .tab a.active {
-	background-color:transparent;
-	color:#ffc107;
-}
-.tabs .tab.disabled a,.tabs .tab.disabled a:hover {
-	color:rgba(102,147,153,0.7);
-}
-.tabs .indicator {
-	background-color:#ffc107;
-}
-</style>
+{% include 'tx.html' %}
 {% endblock %}

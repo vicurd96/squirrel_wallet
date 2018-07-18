@@ -1,217 +1,139 @@
 {% extends 'header.html' %}
 {% load static %}
 {% load i18n %}
-{% load qr_tags %}
 {% block content %}
 <div class="container">
-<div class="card large col s12 m12 l4 pull-l1">
-    <div class="card-tabs">
-       <ul class="tabs tabs-fixed-width">
-         {% if has_btc %}
-         <li class="tab"><a class="active", href="#btcreceive">Bitcoin</a></li>
-         {% endif %}
-          {% if has_eth %}
-         <li class="tab"><a href="#ethreceive">Ethereum</a></li>
-         {% endif %}
-       </ul>
-    </div>
-     {% if has_btc %}
-    <div class="card-content" id="btcreceive">
-        {% for name,item in btc %}
-            {% if name == 'address' %}
-                <center>{% qr_from_text item "m" %}</center>
-                <div class="input-field col s12">
-                    <input value="{{ item }}" id="btcaddress" type="text">
-                    <label for="btcaddress">{% trans 'Your address' %}</label>
-                </div>
-                <div class="center-align">
-                    <button class="btn waves-effect waves-light tooltipped" onclick="copyBTC()" data-tooltip="{% trans 'Copy to clipboard' %}" type="submit" name="action">{% trans 'Copy' %}
-                        <i class="material-icons right">content_copy</i>
-                    </button>
-                </div>
-            {% endif %}
-        {% endfor %}
-    </div>
-    {% endif %}
-     {% if has_eth %}
-    <div class="card-content" id="ethreceive">
-        {% for name,item in eth %}
-            {% if name == 'address' %}
-                <div class="center-align">{% qr_from_text item "m" %}</div>
-                <div class="input-field col s12">
-                    <input value="{{ item }}" id="ethaddress" type="text">
-                    <label for="ethaddress">{% trans 'Your address' %}</label>
-                </div>
-                <div class="center-align">
-                    <button class="btn waves-effect waves-light tooltipped" onclick="copyETH()" data-tooltip="{% trans 'Copy to clipboard' %}" type="submit" name="action">{% trans 'Copy' %}
-                        <i class="material-icons right">content_copy</i>
-                    </button>
-                </div>
-            {% endif %}
-        {% endfor %}
-    </div>
-    {% endif %}
-</div>
-<div class="card large col s12 m12 l8">
-    <div class="card-tabs">
-       <ul class="tabs tabs-fixed-width">
-          {% if has_btc %}
-         <li class="tab"><a class="active", href="#bitcoin">Bitcoin</a></li>
-         {% endif %}
-         {% if has_eth %}
-         <li class="tab"><a href="#ethereum">Ethereum</a></li>
-         {% endif %}
-       </ul>
-    </div>
-         {% if has_btc %}
-        <div id="bitcoin">
-            <ul class="collection">
-            {% for name,item in btc %}
-                {% if name == 'address' %}
-                <li class="collection-item avatar">
-                    <i class="material-icons circle green">payment</i>
-                    <div>
-                        <span class="title grey-text text-darken-4">{% trans 'Your address:' %}</span>
-                        <p>{{ item }}<br>
+    <div class="row">
+        <div class="section">
+            <div class="col s12 m12 l4 pull-l1">
+                <div class="card large">
+                    <div class="card-tabs">
+                       <ul class="tabs tabs-fixed-width">
+                         {% if has_wallet %}
+                         <li class="tab"><a class="active", href="#btcreceive">Bitcoin</a></li>
+                         {% endif %}
+                       </ul>
                     </div>
-                </li>
-                {% endif %}
-                {% if name == 'balance' %}
-                <li class="collection-item avatar">
-                    <i class="material-icons circle blue">attach_money</i>
-                    <div>
-                        <span class="title">{% trans 'Your balance:' %}</span>
-                        <p>{{ item }}<br>
-                    </div>
-                </li>
-                {% endif %}
-                {% if name == 'tx_count' %}
-                <li class="collection-item avatar">
-                    <i class="material-icons circle red">call_made</i>
-                    <div>
-                        <span class="title">{% trans 'Transactions done:' %}</span>
-                        <p>{{ item }}<br>
-                    </div>
-                </li>
-                {% endif %}
-                {% if name == 'last_tx' %}
-                <li class="collection-item avatar">
-                    <i class="material-icons circle purple">history</i>
-                    <div>
-                        <span class="title">{% trans 'Last transaction out:' %}</span>
-                        <p class="truncate">{{ item }}</p>
-                        {% if item %}
-                        <a href="{% url 'detail_bitcoin' item %}" class="secondary-content"><i class="material-icons blue-text">info</i></a>
-                        {% endif %}
-                    </div>
-                </li>
-                {% endif %}
-                {% if name == 'last_to' %}
-                <li class="collection-item avatar">
-                    <i class="material-icons circle orange">history</i>
-                    <div>
-                        <span class="title">{% trans 'Last transaction in:' %}</span>
-                        <p class="truncate">{{ item }}</p>
-                        {% if item %}
-                        <a href="{% url 'detail_bitcoin' item %}" class="secondary-content"><i class="material-icons blue-text">info</i></a>
-                        {% endif %}
-                    </div>
-                </li>
-                {% endif %}
-            {% endfor %}
-            </ul>
-        </div>
-        {% endif %}
-         {% if has_eth %}
-        <div id="ethereum">
-            <ul class="collection">
-                {% for name,item in eth %}
-                    {% if name == 'address' %}
-                    <li class="collection-item avatar">
-                        <i class="material-icons circle green">payment</i>
-                        <div>
-                            <span class="title grey-text text-darken-4">{% trans 'Your address:' %}</span>
-                            <p>{{ item }}<br>
-                        </div>
-                    </li>
-                    {% endif %}
-                    {% if name == 'balance' %}
-                    <li class="collection-item avatar">
-                        <i class="material-icons circle blue">attach_money</i>
-                        <div>
-                            <span class="title">{% trans 'Your balance:' %}</span>
-                            <p>{{ item }}<br>
-                        </div>
-                    </li>
-                    {% endif %}
-                    {% if name == 'tx_count' %}
-                    <li class="collection-item avatar">
-                        <i class="material-icons circle red">call_made</i>
-                        <div>
-                            <span class="title">{% trans 'Transactions done:' %}</span>
-                            <p>{{ item }}<br>
-                        </div>
-                    </li>
-                    {% endif %}
-                    {% if name == 'last_tx' %}
-                    <li class="collection-item avatar">
-                        <i class="material-icons circle purple">history</i>
-                        <div>
-                            <span class="title">{% trans 'Last transaction out:' %}</span>
-                            <p class="truncate">{{ item }}<br></p>
-                            {% if item %}
-                            <a href="{% url 'detail_ether' item %}" class="secondary-content"><i class="material-icons blue-text">info</i></a>
+                     {% if has_wallet %}
+                    <div class="card-content" id="btcreceive">
+                        {% for name,item in wallet %}
+                            {% if name == 'address' %}
+                                <div class="row">
+                                    <div class="col s12">
+                                        <div class="input-field center">
+                                            <img src="{% static 'qrcode/wallet-'|add:item|add:'.png' %}" alt="Address QR Code" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row center">
+                                    <div class="col s10 center-align">
+                                        <div class="input-field">
+                                            <input disabled value="{{ item }}" id="btcaddress" type="text">
+                                            <label for="btcaddress" class="label">{% trans 'Your address' %}</label>
+                                        </div>
+                                    </div>
+                                    <div class="col s2">
+                                        <div class="input-field">
+                                            <button style="padding: 0 0;" class="btn-flat waves-effect waves-light tooltipped" id="copytoclipboard" data-tooltip="{% trans 'Copy to clipboard' %}" type="button" name="action" data-clipboard-text="{{ item }}"><i class="material-icons tooltipped" data-tooltip="{% trans 'Copy to clipboard' %}">content_copy</i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--<div class="center-align">
+                                    <button class="btn waves-effect waves-light tooltipped" data-tooltip="{% trans 'Copy to clipboard' %}" type="button" name="action" data-clipboard-text="{{ item }}">{% trans 'Copy' %}
+                                        <i class="material-icons right">content_copy</i>
+                                    </button>
+                                </div>-->
                             {% endif %}
-                        </div>
-                    </li>
+                        {% endfor %}
+                    </div>
                     {% endif %}
-                    {% if name == 'last_to' %}
-                    <li class="collection-item avatar">
-                        <i class="material-icons circle orange">history</i>
-                        <div>
-                            <span class="title">{% trans 'Last transaction in: ' %}</span>
-                            <p class="truncate">{{ item }}<br></p>
-                            {% if item %}
-                            <a href="{% url 'detail_ether' item %}" class="secondary-content"><i class="material-icons blue-text">info</i></a>
-                            {% endif %}
+                </div>
+            </div>
+            <div class="col s12 m12 l8">
+                <div class="card large">
+                    <div class="card-tabs">
+                       <ul class="tabs tabs-fixed-width">
+                          {% if has_wallet %}
+                         <li class="tab"><a class="active", href="#bitcoin">Bitcoin</a></li>
+                         {% endif %}
+                       </ul>
+                    </div>
+                         {% if has_wallet %}
+                        <div id="bitcoin">
+                            <ul class="collection">
+                            {% for name,item in wallet %}
+                                {% if name == 'address' %}
+                                <li class="collection-item avatar">
+                                    <i class="material-icons circle green">payment</i>
+                                    <div>
+                                        <span class="title grey-text text-darken-4">{% trans 'Your address:' %}</span>
+                                        <p>{{ item }}<br>
+                                    </div>
+                                </li>
+                                {% endif %}
+                                {% if name == 'balance' %}
+                                <li class="collection-item avatar">
+                                    <i class="material-icons circle blue">attach_money</i>
+                                    <div>
+                                        <span class="title">{% trans 'Your balance:' %}</span>
+                                        <p>{{ item }}<br>
+                                    </div>
+                                </li>
+                                {% endif %}
+                                {% if name == 'tx_count' %}
+                                <li class="collection-item avatar">
+                                    <i class="material-icons circle red">call_made</i>
+                                    <div>
+                                        <span class="title">{% trans 'Transactions done:' %}</span>
+                                        <p>{{ item }}<br>
+                                    </div>
+                                </li>
+                                {% endif %}
+                                {% if name == 'last_tx' %}
+                                <li class="collection-item avatar">
+                                    <i class="material-icons circle purple">history</i>
+                                    <div>
+                                        <span class="title">{% trans 'Last transaction out:' %}</span>
+                                        <p class="truncate">{{ item }}</p>
+                                        {% if item %}
+                                        <a href="{% url 'detail_bitcoin' item %}" class="secondary-content"><i class="material-icons blue-text">info</i></a>
+                                        {% endif %}
+                                    </div>
+                                </li>
+                                {% endif %}
+                                {% if name == 'last_to' %}
+                                <li class="collection-item avatar">
+                                    <i class="material-icons circle orange">history</i>
+                                    <div>
+                                        <span class="title">{% trans 'Last transaction in:' %}</span>
+                                        <p class="truncate">{{ item }}</p>
+                                        {% if item %}
+                                        <a href="{% url 'detail_bitcoin' item %}" class="secondary-content"><i class="material-icons blue-text">info</i></a>
+                                        {% endif %}
+                                    </div>
+                                </li>
+                                {% endif %}
+                            {% endfor %}
+                            </ul>
                         </div>
-                    </li>
-                    {% endif %}
-                {% endfor %}
-            </ul>
+                        {% endif %}
+                </div>
+            </div>
         </div>
-        {% endif %}
+    </div>
 </div>
-</div>
-{% include 'btctx.html' %}
+{% include 'tx.html' %}
 
 <script>
-function copyBTC() {
-  var copyText = document.getElementById("btcaddress");
-  copyText.select();
-  document.execCommand("Copy");
-  copyText.tooltip('close');
-}
-function copyETH() {
-  var copyText = document.getElementById("ethaddress");
-  copyText.select();
-  document.execCommand("Copy");
-}
-</script>
 
-<style>
-.tabs .tab a{
-    color:#bdbdbd;
-}
-.tabs .tab a:hover,.tabs .tab a.active {
-	background-color:transparent;
-	color:#ffc107;
-}
-.tabs .tab.disabled a,.tabs .tab.disabled a:hover {
-	color:rgba(102,147,153,0.7);
-}
-.tabs .indicator {
-	background-color:#ffc107;
-}
-</style>
+$('#copytoclipboard').on("click", function() {
+  value = $(this).data('clipboard-text')
+  var $temp = $("<input>");
+  $("body").append($temp);
+  $temp.val(value).select();
+  document.execCommand("copy");
+  $temp.remove();
+  $('this').tooltip('close');
+});
+</script>
 {% endblock %}

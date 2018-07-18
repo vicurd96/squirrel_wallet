@@ -13,3 +13,4 @@ django-fernet-fields>=0.5
 redis>=2.10.6
 coinbase>=2.1.0
 currencyconverter>=0.13.3
+rlp==0.6.0

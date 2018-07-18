@@ -22,7 +22,7 @@
     <form method="post">
         {% csrf_token %}
         {% for field in form %}
-        {% if field.name == 'password' or field.name == 'address' %}
+        {% if field.name == 'password' or field.name == 'address' or field.name == 'avatar' %}
          <div class="input-field col s12">
         {% else %}
         <div class="input-field col s6">

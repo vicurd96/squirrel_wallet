@@ -1,18 +1,19 @@
-from django.conf.urls import url
 from django.conf.urls import url, include
+from django.conf.urls.static import static
+
 from wallet.views import *
 from django.urls import path, re_path
 
 user_urls = [
-    path('dashboard',view=Dashboard.as_view(),name='dashboard'),
-    path('bitcoin/create',view=CreateBTC.as_view(),name='bitcoincreate'),
-    path('ethereum/create',view=CreateETH.as_view(),name='ethereumcreate'),
-    path('',view=WalletView.as_view(),name="wallet"),
+    path('dashboard/',view=Dashboard.as_view(),name='dashboard'),
+    path('bitcoin/generate/', view=CreateWalletView.as_view(), name='createwallet'),
+    path('',view=WalletView.as_view(),name='wallet'),
     path('settings/<pk>',view=SettingsView.as_view(),name="settings"),
+    path('profile/<pk>',view=ProfileView.as_view(),name="profile"),
     path('bitcoin/<pk>',view=TransactionView.as_view(),name="detail_bitcoin"),
-    path('ether/<pk>',view=ETHTransactionView.as_view(),name="detail_ether"),
-    path('activity/',view=ActivityView.as_view(),name="activity")
-    ]
+    path('activity/',view=ActivityView.as_view(),name="activity"),
+    path('change_password/',view=PasswordChangeView.as_view(),name="change_password"),
+]
 
 urlpatterns = [
     path('',include(user_urls)),

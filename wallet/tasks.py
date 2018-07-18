@@ -19,36 +19,36 @@ def update_transactions():
     for user in wallet.iterator():
         if user.currency.abrev == 'BTC':
             tx_updated = NetworkAPI.get_transactions_testnet(user.address)
-            tx = list(BTCTransaction.objects.filter(wallet=user).values_list('txid',flat=True))
+            tx = list(Transaction.objects.filter(wallet=user).values_list('txid',flat=True))
             diff = list(set(tx_updated) - set(tx))
             for newtx in diff:
-                tx = BTCTransaction(txid=newtx,wallet=user,status=True,type='IN',to=user.address)
+                tx = Transaction(txid=newtx,wallet=user,status=True,type='IN',to=user.address)
                 tx.save()
-        elif user.currency.abrev == 'ETH':
-            tx = ETHTransaction.objects.filter(wallet=user).order_by('-created_at').values_list('txid',flat=True)
-            if tx or user.block:
-                startblock = user.block if user.block else network.eth.getTransaction(tx.first())['blockNumber']
-            else:
-                startblock = None
-            tx_updated = getTransactionsByAccount(myaccount=user.address,startBlockNumber=startblock,wallet=user)
-            tx = list(tx)
-            diff = list(set(tx_updated) - set(tx))
-            for newtx in diff:
-                tx = ETHTransaction(txid=newtx,wallet=user,status=True,type='IN',to=user.address)
-                tx.save()
+        # elif user.currency.abrev == 'ETH':
+        #     tx = ETHTransaction.objects.filter(wallet=user).order_by('-created_at').values_list('txid',flat=True)
+        #     if tx or user.block:
+        #         startblock = user.block if user.block else network.eth.getTransaction(tx.first())['blockNumber']
+        #     else:
+        #         startblock = None
+        #     tx_updated = getTransactionsByAccount(myaccount=user.address,startBlockNumber=startblock,wallet=user)
+        #     tx = list(tx)
+        #     diff = list(set(tx_updated) - set(tx))
+        #     for newtx in diff:
+        #         tx = ETHTransaction(txid=newtx,wallet=user,status=True,type='IN',to=user.address)
+        #         tx.save()
 
 @task()
 def update_balances():
     wallet = Wallet.objects.all()
     for user in wallet.iterator():
-        if user.currency.abrev == 'BTC':
+        if user.currency:
             key = PrivateKeyTestnet(user.private_key)
             user.balance = key.get_balance('btc')
             user.save()
-        else:
-            network = connect_ether_network()
-            user.balance = from_wei(network.eth.getBalance(user.address),'ether')
-            user.save()
+        # else:
+        #     network = connect_ether_network()
+        #     user.balance = from_wei(network.eth.getBalance(user.address),'ether')
+        #     user.save()
 
 def connect_ether_network(api=settings.ETH_API_URL):
     provider = HTTPProvider(api)
@@ -56,7 +56,7 @@ def connect_ether_network(api=settings.ETH_API_URL):
     return web3
 
 @app.task
-def process_tx_btc(tx_hex,txmodel):
+def process_tx_btc(tx_hex,tx):
     try:
         NetworkAPI.broadcast_tx_testnet(tx_hex)
         tx.status = True
@@ -66,49 +66,10 @@ def process_tx_btc(tx_hex,txmodel):
 
 @app.task
 def process_all_pending_txs_btc():
-    txlist = BTCTransaction.objects.filter(status__isnull=True)
+    txlist = Transaction.objects.filter(status__isnull=True)
     for tx in txlist.iterator():
         tx_hex = key.sign_transaction(tx.json)
         NetworkAPI.broadcast_tx_testnet(tx_hex)
-
-@app.task
-def process_all_pending_txs_eth():
-    txlist = ETHTransaction.objects.filter(status=False)
-    network = connect_ether_network()
-    for tx in txlist.iterator():
-        wallet = tx.wallet
-        nonce = network.eth.getTransactionCount(wallet.address)
-
-        ''' Definiendo el gas total para la transacción '''
-        startgas = network.eth.estimateGas({'to':tx.to,'from':wallet.address,'value':to_wei(tx.amount,'ether')})
-        if tx.gas > startgas:
-            startgas = tx.gas
-
-        gasprice = network.eth.gasPrice
-        data = b''
-
-        if(from_wei(network.eth.getBalance(user.address),'ether') > tx.amount + from_wei(startgas,'ether')):
-            txdata = Tranx(
-                nonce = nonce,
-                gasprice = gasprice,
-                startgas = startgas,
-                to = tx.to,
-                value = to_wei(tx.amount, 'ether'),
-                data = data,
-            )
-            txdata.sign(wallet.private_key)
-            raw_tx = encode(txdata)
-            raw_tx_hex = web3.toHex(raw_tx)
-            tx.txid = network.eth.sendRawTransaction(raw_tx_hex)
-
-            ''' Guardando la transacción '''
-            tx.gasPrice = gasprice
-            tx.gas = startgas
-            tx.status = True
-            tx.save()
-        else:
-            tx.status = None
-            tx.save()
 
 @app.task
 def update_values():

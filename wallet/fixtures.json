@@ -4,15 +4,8 @@
     "pk": 1,
     "fields": {
       "abrev": "BTC",
+      "api": "Testing",
       "name": "Bitcoin"
-    }
-  },
-  {
-    "model": "wallet.Currency",
-    "pk": 2,
-    "fields": {
-        "abrev": "ETH",
-        "name": "Ethereum"
     }
   }
 ]
