@@ -3,12 +3,12 @@ from django import forms
 from django.core.validators import MinValueValidator
 
 from .models import *
-from wallet.mixins import *
-from wallet.validators import *
+from wallet.validators import check_bc
 from django.utils.translation import gettext as _
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from bit.network import get_fee, get_fee_cached, NetworkAPI
 from django_countries.widgets import CountrySelectWidget
+from django.db.models import Q
 
 
 class PasswordForm(PasswordChangeForm):
@@ -33,11 +33,11 @@ class TransactionForm(forms.ModelForm):
     except requests.ConnectionError:
         normal_fee, fast_fee = get_fee_cached(fast=False), get_fee_cached(fast=True)
     CHOICES = ((normal_fee, 'Normal',), (fast_fee, 'Fast',))
-    to = forms.CharField(label=_('To address'),
+    to = forms.CharField(validators=[check_bc],label=_('To address'),
                          widget=forms.TextInput(
                              attrs={'type': 'text', 'data-content': 'Introduce a valid address', 'class': 'btcaddress',
                                     'placeholder': 'Address to transfer'}),
-                         max_length=64, validators=[check_bc])
+                         max_length=64)
     amount = forms.DecimalField(validators=[MinValueValidator(settings.MIN_BTC_TX)],label=_('Amount'),
                                 widget=forms.TextInput(
                                     attrs={'type': 'text', 'data-content': 'Introduce a valid amount',
@@ -54,17 +54,14 @@ class TransactionForm(forms.ModelForm):
     def __init__(self, user, *args, **kwargs):
         self.user = user
         super(TransactionForm, self).__init__(*args, **kwargs)
+        self.fields['to'].error_messages = {'required': 'Destination address is required.'}
+        self.fields['amount'].error_messages = {'required': 'Enter a valid amount.'}
 
     def clean(self):
-        cleaned_data = super().clean()
+        cleaned_data = super(TransactionForm, self).clean()
         amount = cleaned_data.get("amount")
         fee = cleaned_data.get("fee")
         wallet = Wallet.objects.filter(user=self.user, currency__abrev='BTC').get()
-        try:
-            wallet.balance = NetworkAPI.get_balance_testnet(wallet.address)
-            wallet.save()
-        except:
-            pass
         if float(wallet.balance) < settings.MIN_BTC_TX or float(wallet.balance) < settings.MIN_BTC_TX + float(fee):
             raise forms.ValidationError(
                 _('Balance must be greater than min amount (%(value)s) + fee'), params={'value': settings.MIN_BTC_TX}
@@ -180,6 +177,22 @@ class UserForm(forms.ModelForm):
             self.user.save()
         return self.user
 
+class AddContactForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ('contacts',)
+
+    def __init__(self, user, *args, **kwargs):
+        self.user = user
+        super(AddContactForm,self).__init__(*args, **kwargs)
+
+    def save(self, commit=True):
+        search = self.cleaned_data['contacts']
+        self.user.contacts.add(search)
+        if commit:
+            self.user.save()
+        return self.user
+
 
 class ProfileForm(forms.ModelForm):
     HOMBRE = 'Male'
@@ -241,7 +254,8 @@ class ProfileForm(forms.ModelForm):
         self.user.profile.phone = self.cleaned_data['phone']
         self.user.profile.country = self.cleaned_data['country']'''
         if commit:
-            op = Operation(user=self.user, type='Update')
+            op = Operation.objects.create(type='Update')
+            op.user.add(self.user)
             op.save()
             self.user.profile.save()
         return self.user.profile

@@ -7,12 +7,16 @@
    {% for field in profile_form %}
        {% if field.name == 'password' or field.name == 'address' %}
        <div class="input-field col s12">
+           {% if field.name == 'address' %}
+                <i class="material-icons prefix">near_me</i>
+           {% endif %}
            {{ field }}
            <label for="{{ field.label }}">{{ field.label }}</label>
        </div>
         {% elif field.name == 'avatar' %}
         <div class="file-field input-field">
-            <div class="btn btn-small purple accent-4">
+            <div class="btn btn-small red accent-2">
+                <i class="material-icons left">account_circle</i>
                 <span>{% trans 'Avatar' %}</span>
                 {{ field }}
             </div>
@@ -23,6 +27,15 @@
        </div>
        {% else %}
        <div class="input-field col s6">
+           {% if field.name == 'gender' %}
+                <i class="material-icons prefix">wc</i>
+           {% elif field.name == 'birthdate' %}
+                <i class="material-icons prefix">perm_contact_calendar</i>
+           {% elif field.name == 'country' %}
+                <i class="material-icons prefix">language</i>
+           {% elif field.name == 'phone' %}
+                <i class="material-icons prefix">phone</i>
+           {% endif %}
            {{ field }}
            <label for="{{ field.label }}">{{ field.label }}</label>
        </div>

@@ -43,7 +43,6 @@ INSTALLED_APPS = [
     'wallet',
     'django_extensions',
     'django_countries',
-    'imagekit'
 ]
 
 SITE_ID = 1
@@ -125,14 +124,12 @@ WSGI_APPLICATION = 'squirrel_wallet.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
+PROJECT_DIR = os.path.abspath(os.path.dirname(__file__))
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'squirrel_wallet',
-        'USER': 'licom',
-        'PASSWORD': 'licom2018',
-        'HOST': '127.0.0.1',
-        'PORT': '3306',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(PROJECT_DIR, 'squirrel_wallet.db'),
     }
 }
 

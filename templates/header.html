@@ -3,6 +3,7 @@
 <head>
     <title class"center-align">Squirrel Wallet</title>
     <meta meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
     <!-- CSS Styles -->
     <link href="{% static 'css/material-icons.css' %}" rel="stylesheet">
     <link href="{% static 'css/fontawesome/fontawesome-all.css' %}" rel="stylesheet">
@@ -11,18 +12,24 @@
     <link rel="stylesheet" href="{% static 'css/materialize.css' %}"  media="screen,projection"/>
     <link href="{% static 'css/header.css' %}" rel="stylesheet">
     <link rel="shortcut icon" type="image/png" href="{% static 'images/wallet-solid.ico' %}"/>
+    <link href="{% static 'css/slick.css' %}" rel="stylesheet" type="text/css"/>
+    <link href="{% static 'css/datatables.css' %}" rel="stylesheet" type="text/css"/>
     <!--<link href="{% static 'css/highcharts.css' %}" rel="stylesheet">-->
+
     <!-- Javascript -->
     <script src="{% static 'js/jquery.min.js' %}"></script>
     <script src="{% static 'js/materialize.js' %}"></script>
     <script src="{% static 'js/materialize-validation.min.js' %}"></script>
     <!--<script src="{% static 'js/highcharts.js' %}"></script>
     <script src="{% static 'js/modules/stock.js' %}"></script>-->
+    <script src="{% static 'js/slick.min.js' %}"></script>
     <script src="{% static 'js/header.js' %}"></script>
+    <script src="{% static 'js/datatables.min.js' %}"></script>
+
     <!--            -->
 </head>
 <nav>
-    <div class="nav-wrapper z-depth-1 purple accent-4">
+    <div class="nav-wrapper z-depth-1 blue darken-4">
     <div class="container">
     <a href="{% url 'dashboard' %}" class="brand-logo">&nbsp;<i class="material-icons left">account_balance_wallet</i>Squirrel Wallet</a>
     <a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
@@ -31,13 +38,14 @@
         <li><a class="tooltipped" data-position="bottom" data-tooltip="{% trans 'Settings' %}" href="{% url 'settings' user.pk %}"><img src='/static/avatar/{{ user.id }}' alt="{{ user.get_short_name }}" class="circle" style="width: 54px; heigth: 64px" > <!-- notice the "circle" class --></a></li>
         <!--<li><a class="tooltipped" data-position="bottom" data-tooltip="{% trans 'Profile' %}" href="{% url 'profile' user.pk %}"><i class="material-icons">account_box</i></a></li>-->
         <li><a class="tooltipped" data-position="bottom" data-tooltip="{% trans 'Settings' %}" href="{% url 'settings' user.pk %}"><i class="material-icons">settings</i></a></li>
+        <li><a class="tooltipped" data-position="bottom" data-tooltip="{% trans 'Contacts' %}" href="#!"><i class="material-icons">contacts</i></a></li>
         {% if has_wallet %}
         <li><a class="tooltipped" data-position="bottom" data-tooltip="{% trans 'Wallet' %}" href="{% url 'wallet' %}"><i class="material-icons">account_balance</i></a></li>
       {% else %}
         <li disabled><a href="#cwmodal" class="tooltipped modal-trigger" data-position="bottom" data-tooltip="{% trans 'Create a wallet' %}"><i class="material-icons">account_balance</i></a></li>
       {% endif %}
-        <li><a class="tooltipped" data-position="bottom" data-tooltip="{% trans 'Activity' %}" href="{% url 'activity' %}"><i class="material-icons"><i class="material-icons">credit_card</i>t</i></a></li>
-        <li><a class="tooltipped" data-position="bottom" data-tooltip="{% trans 'Logout' %}" href="{% url 'auth_logout' %}"><i class="material-icons">power_settings_new</i></a></li>&nbsp;
+        <li><a class="tooltipped" data-position="bottom" data-tooltip="{% trans 'Activity' %}" href="{% url 'activity' %}"><i class="material-icons"><i class="material-icons">restore</i>t</i></a></li>
+        <li><a class="tooltipped modal-trigger" data-position="bottom" data-tooltip="{% trans 'Logout' %}" href="#logoutmodal"><i class="material-icons">power_settings_new</i></a></li>&nbsp;
       {% else %}
         <li><a class="tooltipped" data-position="bottom" data-tooltip="{% trans 'Login' %}" href="{% url 'login' %}"><i class="material-icons">input</i></a></li>
         <li><a class="tooltipped" data-position="bottom" data-tooltip="{% trans 'Sign up' %}" href="{% url 'registration_register' %}"><i class="material-icons">people</i></a></li>
@@ -52,7 +60,7 @@
           <li><a class="waves-effect waves-light"><i class="material-icons">account_balance</i>Create your wallet</a></li>
         {% endif %}
           <li><a href="{% url 'settings' user.pk %}" class="waves-effect waves-light"><i class="material-icons">account_box</i>Settings</a></li>
-          <li><a href="{% url 'activity' %}" class="waves-effect waves-light"><i class="material-icons">credit_card</i>Activity</a></li>
+          <li><a href="{% url 'activity' %}" class="waves-effect waves-light"><i class="material-icons">restore</i>Activity</a></li>
           <li><a href="{% url 'auth_logout' %}" class="waves-effect waves-light"><i class="material-icons">power_settings_new</i>Log out</a></li>
       </div>
     </ul>
@@ -69,7 +77,7 @@
       <a class="btn-floating btn-large red accent-2"><i class="large material-icons">account_balance_wallet</i></a>
       <ul>
         {% if has_btc %}
-          <li><a href="#bitcointx" class="btn-floating amber accent-2 modal-trigger tooltipped" data-position="left" data-tooltip="{% trans 'Send bitcoins' %}"><i class="fab fa-btc"></i></a></li>
+          <li><a href="#transaction" class="btn-floating amber accent-2 modal-trigger tooltipped" data-position="left" data-tooltip="{% trans 'Send bitcoins' %}"><i class="fab fa-btc"></i></a></li>
         {% else %}
           <li><a class="btn-floating amber accent-2 modal-trigger tooltipped createwallet" data-position="left" data-tooltip="{% trans 'New bitcoin wallet' %}" data-url="{% url 'createwallet' %}"><i class="fab fa-btc"></i></a></li>
         {% endif %}
@@ -94,6 +102,18 @@
                 </div>
             </div>
         </div>
+      </div>
+  </div>
+  <div id="logoutmodal" class="modal">
+      <div class="section">
+          <div class="modal-content">
+              <h3>Modal Header</h3>
+              <p>Are you sure you want to log out?</p>
+          </div>
+      </div>
+      <div class="modal-footer">
+          <a class="modal-close waves-effect waves-green btn-flat">No</a>
+          <a href="{% url 'auth_logout' %}" class="modal-close waves-effect waves-green btn-flat red-text">Yes</a>
       </div>
   </div>
 </body>

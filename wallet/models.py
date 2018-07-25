@@ -15,12 +15,10 @@ from django.db.models.signals import post_save
 from django.core.mail import send_mail
 import uuid
 
-from imagekit.models import ImageSpecField
-from pilkit.processors import ResizeToFill
 from qrcode import constants
 from qrcode.main import QRCode
 
-from wallet.currency.Bitcoin import *
+#from wallet.currency.Bitcoin import *
 
 from fernet_fields import EncryptedCharField
 from bit import PrivateKeyTestnet
@@ -108,6 +106,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(_('First name'), null=False, blank=False, max_length=20)
     last_name = models.CharField(_('Last name'), null=False, blank=False, max_length=20)
     email = models.EmailField(_('Email'), unique=True, null=False, blank=False)
+    contacts = models.ManyToManyField('User')
     is_staff = models.BooleanField(_('staff status'), default=False,
                                    help_text=_('Designates whether the user can log into this admin '
                                                'site.'))
@@ -148,10 +147,10 @@ class Profile(models.Model):
     )
     user = models.OneToOneField('User', on_delete=models.CASCADE)
     avatar = models.ImageField(upload_to=RandomFileName('static/avatar'), default='static/avatar/None/no-img.jpg', storage=OverwriteStorage())
-    avatar_thumbnail = ImageSpecField(source='avatar',
+    '''avatar_thumbnail = ImageSpecField(source='avatar',
                                       processors=[ResizeToFill(50, 50)],
                                       format='JPEG',
-                                      options={'quality': 60})
+                                      options={'quality': 60})'''
     birthdate = models.DateField(_('Birthdate'), null=True, blank=True)
     address = models.CharField(_('Address'), null=True, blank=True, max_length=52)
     phone = models.CharField(_('Number phone'), null=True, blank=True, max_length=11)
@@ -179,6 +178,8 @@ class Currency(models.Model):
 
     class Meta:
         db_table = 'currencies'
+        verbose_name = 'currency'
+        verbose_name_plural = 'currencies'
 
 
 class Value(models.Model):
@@ -188,13 +189,15 @@ class Value(models.Model):
 
     class Meta:
         db_table = 'values'
+        verbose_name = 'value'
+        verbose_name_plural = 'values'
 
 
 class Wallet(models.Model):
     address = models.CharField(primary_key=True, max_length=64)
     private_key = EncryptedCharField(null=False, max_length=64)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
-    currency = models.ForeignKey('Currency', on_delete=models.PROTECT)
+    currency = models.ForeignKey(Currency, on_delete=models.PROTECT)
     balance = models.DecimalField(_('Balance'), max_digits=16, decimal_places=8, default=0)
     created_at = models.DateTimeField(_('Created at'), auto_now_add=True)
     last_update = models.DateTimeField(_('Last update'), auto_now_add=False)
@@ -256,7 +259,7 @@ class Operation(models.Model):
         ('security', SEC),
         ('TX', TX),
     )
-    user = models.ForeignKey('User', on_delete=models.PROTECT)
+    user = models.ManyToManyField('User')
     type = models.CharField(null=True, max_length=8, choices=OPERATION_CHOICES)
     created_at = models.DateTimeField(_('Created at'), auto_now_add=True)
 

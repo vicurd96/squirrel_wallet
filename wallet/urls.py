@@ -13,6 +13,7 @@ user_urls = [
     path('bitcoin/<pk>',view=TransactionView.as_view(),name="detail_bitcoin"),
     path('activity/',view=ActivityView.as_view(),name="activity"),
     path('change_password/',view=PasswordChangeView.as_view(),name="change_password"),
+    path('bitcoin/actions/new_transaction',view=TransactionCreateView.as_view(),name="bitcoin_new_transaction"),
 ]
 
 urlpatterns = [

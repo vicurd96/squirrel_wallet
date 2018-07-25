@@ -14,7 +14,6 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from currency_converter import CurrencyConverter
 from django.utils.module_loading import import_string
 
-from chartit import DataPool, Chart
 from bit.network import get_fee, get_fee_cached
 
 REGISTRATION_FORM_PATH = getattr(settings, 'REGISTRATION_FORM',
@@ -63,7 +62,7 @@ class Index(generic.TemplateView):
     template_name = "index.html"
 
 
-class TransactionCreateView(LoginRequiredMixin, generic.CreateView):
+class TransactionCreateView(AjaxFormMixin, LoginRequiredMixin, generic.CreateView):
     redirect_field_name = None
     template_name = 'tx.html'
     form_class = TransactionForm
@@ -71,7 +70,7 @@ class TransactionCreateView(LoginRequiredMixin, generic.CreateView):
 
     def get_form_kwargs(self):
         kwargs = super(TransactionCreateView, self).get_form_kwargs()
-        kwargs['user_pk'] = self.request.pk
+        kwargs['user'] = self.request.user
         return kwargs
 
 
@@ -219,9 +218,11 @@ class SettingsView(WalletMixin, LoginRequiredMixin, generic.TemplateView):
         return kwargs
 
     def get(self, request, *args, **kwargs):
+        transaction_form = TransactionForm(self.request.GET)
         changepass_form = PasswordChangeForm(self.request.GET)
         profile_form = ProfileForm(user=self.request.user)
         context = self.get_context_data(**kwargs)
+        context['transaction_form'] = transaction_form
         context['changepass_form'] = changepass_form
         context['profile_form'] = profile_form
         return self.render_to_response(context)
@@ -231,6 +232,7 @@ class WalletView(WalletMixin, LoginRequiredMixin, generic.ListView):
     template_name = 'wallet.html'
     context_object_name = 'wallet'
     success_url = '/wallet'
+    data = None
 
     def get_queryset(self):
         return Wallet.objects.filter(user=self.request.user)
@@ -238,6 +240,22 @@ class WalletView(WalletMixin, LoginRequiredMixin, generic.ListView):
     def get_context_data(self, *args, **kwargs):
         context = super(WalletView, self).get_context_data(**kwargs)
         if self.get_wallet():
+            if self.request.is_ajax():
+                wallet = self.get_wallet().filter(currency__abrev='BTC')
+                wallet = wallet.get() if wallet else None
+                if(wallet):
+                    self.data = {
+                        'has_wallet': True,
+                        'qrcode': wallet.qrcode,
+                        'address': wallet.address,
+                        'balance': wallet.balance,
+                        'tx_count': Transaction.objects.filter(wallet=wallet, type='OUT').count(),
+                        'last_tx': Transaction.objects.filter(wallet=wallet, type='OUT').
+                            order_by('-created_at').values_list('txid',flat=True).first(),
+                        'last_to': Transaction.objects.filter(wallet=wallet, type='IN').
+                            order_by('-created_at').values_list('txid',flat=True).first(),
+                    }
+                return JsonResponse(self.data);
             context['has_wallet'] = True
             wallet = self.get_wallet().filter(currency__abrev='BTC')
             wallet = wallet.get() if wallet else None
@@ -273,84 +291,13 @@ class Dashboard(WalletMixin, LoginRequiredMixin, generic.ListView):
     template_name = 'dashboard.html'
     success_url = '/wallet/dashboard'
 
-    '''def btc_currency_value_chart(self):
-        currencydata = \
-            DataPool(
-                series=
-                [{'options': {
-                    'source': Value.objects.all().order_by('-date')[:10]
-                },
-                    'terms': [
-                        {'Bitcoin value': 'value'},
-                        'date', ]}
-                ])
-        cht = Chart(
-            datasource=currencydata,
-            series_options=
-            [{'options': {
-                'type': 'line',
-                'stacking': False,
-            },
-                'terms': {
-                    'date': [
-                        'Bitcoin value',
-                    ]
-                }}],
-            chart_options=
-            {'title': {
-                'text': ' '},
-                'xAxis': {
-                    'title': {
-                        'text': 'Date'}}})
-        return cht
-
-    def btc_tx_count(self):
-        ds = DataPool(
-            series=[{
-                'options': {
-                    'source': Transaction.objects.all().order_by('-created_at')[:10]
-                },
-                'terms': [
-                    {'Bitcoin transactions': 'id'},
-                    'created_at',
-                ]
-            }]
-        )
-
-        cht = Chart(
-            datasource=ds,
-            series_options=[{
-                'options': {
-                    'type': 'line',
-                    'xAxis': 0,
-                    'yAxis': 0,
-                    'stack': 0,
-                },
-                'terms': {
-                    'created_at': [
-                        'Bitcoin transactions',
-                    ]
-                }
-            }],
-            chart_options={
-                'title': {
-                    'text': ' '
-                },
-                'xAxis': {
-                    'min': 0,
-                    'title': {
-                        'text': 'History of all transactions per hour'
-                    }
-                }
-            }
-        )
-        return cht'''
-
     def get_queryset(self):
         return Wallet.objects.filter(user=self.request.user)
 
     def get_context_data(self, *args, **kwargs):
         context = super(Dashboard, self).get_context_data(**kwargs)
+        transaction_form = TransactionForm(self.request.GET)
+        context['transaction_form'] = transaction_form
         context['has_tx'] = True if self.get_tx() else False
         if self.get_queryset():
             context['has_wallet'] = True

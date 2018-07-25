@@ -6,7 +6,7 @@
     <div class="row">
         <div class="section">
             <div class="col s12 m12 l4 pull-l1">
-                <div class="card large">
+                <div class="card">
                     <div class="card-tabs">
                        <ul class="tabs tabs-fixed-width">
                          {% if has_wallet %}
@@ -50,7 +50,7 @@
                 </div>
             </div>
             <div class="col s12 m12 l8">
-                <div class="card large">
+                <div class="card">
                     <div class="card-tabs">
                        <ul class="tabs tabs-fixed-width">
                           {% if has_wallet %}
@@ -59,7 +59,7 @@
                        </ul>
                     </div>
                          {% if has_wallet %}
-                        <div id="bitcoin">
+                        <div id="bitcoin" class="card-content">
                             <ul class="collection">
                             {% for name,item in wallet %}
                                 {% if name == 'address' %}
@@ -133,7 +133,6 @@ $('#copytoclipboard').on("click", function() {
   $temp.val(value).select();
   document.execCommand("copy");
   $temp.remove();
-  $('this').tooltip('close');
 });
 </script>
 {% endblock %}
