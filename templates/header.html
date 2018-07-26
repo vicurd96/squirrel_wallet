@@ -35,7 +35,7 @@
     <a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
     <ul class="right hide-on-med-and-down">
       {% if user.is_authenticated %}
-        <li><a class="tooltipped" data-position="bottom" data-tooltip="{% trans 'Settings' %}" href="{% url 'settings' user.pk %}"><img src='/static/avatar/{{ user.id }}' alt="{{ user.get_short_name }}" class="circle" style="width: 54px; heigth: 64px" > <!-- notice the "circle" class --></a></li>
+        <!--<li><a class="tooltipped" data-position="bottom" data-tooltip="{% trans 'Settings' %}" href="{% url 'settings' user.pk %}"><img src='/static/avatar/{{ user.id }}' alt="{{ user.get_short_name }}" class="circle" style="max-width:30px; max-height: 30px;"/></a></li>-->
         <!--<li><a class="tooltipped" data-position="bottom" data-tooltip="{% trans 'Profile' %}" href="{% url 'profile' user.pk %}"><i class="material-icons">account_box</i></a></li>-->
         <li><a class="tooltipped" data-position="bottom" data-tooltip="{% trans 'Settings' %}" href="{% url 'settings' user.pk %}"><i class="material-icons">settings</i></a></li>
         <li><a class="tooltipped" data-position="bottom" data-tooltip="{% trans 'Contacts' %}" href="#!"><i class="material-icons">contacts</i></a></li>
@@ -44,7 +44,7 @@
       {% else %}
         <li disabled><a href="#cwmodal" class="tooltipped modal-trigger" data-position="bottom" data-tooltip="{% trans 'Create a wallet' %}"><i class="material-icons">account_balance</i></a></li>
       {% endif %}
-        <li><a class="tooltipped" data-position="bottom" data-tooltip="{% trans 'Activity' %}" href="{% url 'activity' %}"><i class="material-icons"><i class="material-icons">restore</i>t</i></a></li>
+        <li><a class="tooltipped modal-trigger" data-position="bottom" data-tooltip="{% trans 'Activity' %}" href="#activitymodal"><i class="material-icons"><i class="material-icons">restore</i>t</i></a></li>
         <li><a class="tooltipped modal-trigger" data-position="bottom" data-tooltip="{% trans 'Logout' %}" href="#logoutmodal"><i class="material-icons">power_settings_new</i></a></li>&nbsp;
       {% else %}
         <li><a class="tooltipped" data-position="bottom" data-tooltip="{% trans 'Login' %}" href="{% url 'login' %}"><i class="material-icons">input</i></a></li>
@@ -107,13 +107,91 @@
   <div id="logoutmodal" class="modal">
       <div class="section">
           <div class="modal-content">
-              <h3>Modal Header</h3>
+              <h3>Logging out</h3>
               <p>Are you sure you want to log out?</p>
           </div>
       </div>
       <div class="modal-footer">
-          <a class="modal-close waves-effect waves-green btn-flat">No</a>
-          <a href="{% url 'auth_logout' %}" class="modal-close waves-effect waves-green btn-flat red-text">Yes</a>
+          <a class="modal-close waves-effect waves-green btn grey white-text">No</a>
+          <a href="{% url 'auth_logout' %}" class="modal-close waves-effect waves-green btn red white-text">Yes</a>
+      </div>
+  </div>
+  <div id="activitymodal" class="modal bottom-sheet">
+      <div class="modal-content">
+          <div class="row">
+              <div class="col l6">
+                  <h2 class="red-text text-accent-2 center-align">Activity</h2>
+                  <table class="table highlight responsive-table centered">
+                      <thead>
+                      <tr>
+                          <th>{% trans 'Activity ID' %}</th>
+                          <th>{% trans 'Description' %}</th>
+                          <th>{% trans 'Date' %}</th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                      {% for op in activity.operations %}
+                      <tr>
+                          <td>{{ op.id }}</td>
+                          {% if op.type == "Pass" %}
+                          <td>{% trans 'Password changed' %}</td>
+                          {% elif op.type == 'Security' %}
+                          <td>{% trans '2-pass configured' %}</td>
+                          {% elif op.type == 'TXBTC' or op.type == 'BTCTX' %}
+                          <td>{% trans 'Bitcoin transaction' %}</td>
+                          {% elif op.type == 'ETHTX' or op.type == 'TXETH' %}
+                          <td>{% trans 'Ethereum transaction' %}</td>
+                          {% else %}
+                          <td>{% trans 'Updated profile' %}</td>
+                          {% endif %}
+                          <td>{{ op.created_at }}</td>
+                      </tr>
+                      {% endfor %}
+                      </tbody>
+                  </table>
+              </div>
+              <div class="col l6">
+                  <h2 class="red-text text-accent-2 center-align">Transactions</h2>
+                  {% if activity.transactions %}
+                      <table class="table highlight responsive-table centered">
+                          <thead>
+                          <tr>
+                              <th>{% trans 'Transaction ID' %}</th>
+                              <th>{% trans 'Description' %}</th>
+                              <th>{% trans 'Type' %}</th>
+                              <th>{% trans 'Amount' %}</th>
+                              <th>{% trans 'Date' %}</th>
+                              <th>{% trans 'Info' %}</th>
+                          </tr>
+                          </thead>
+                          <tbody>
+                          {% for op in activity.transactions %}
+                          <tr>
+                              <td>{{ op.txid|truncatechars:30 }}</span></td>
+                              {% if op.gas %}
+                              <td>{% trans 'Ethereum transaction' %}</td>
+                              {% else %}
+                              <td>{% trans 'Bitcoin transaction' %}</td>
+                              {% endif %}
+                              {% if op.type == 'IN' %}
+                              <td><span class="white-text badge green">IN</span></td>
+                              {% else %}
+                              <td><span class="white-text badge red">OUT</span></td>
+                              {% endif %}
+                              <td>{{ op.amount|floatformat:3 }}</td>
+                              <td>{{ op.created_at }}</td>
+                              {% if op.gas %}
+                              <td><a href="{% url 'detail_ether' op.txid %}"<i class="material-icons">info</i></a></td>
+                              {% else %}
+                              <td><a href="{% url 'detail_bitcoin' op.txid %}"<i class="material-icons">info</i></a></td>
+                              {% endif %}
+                          </tr>
+                          {% endfor %}
+                          </tbody>
+                      </table>
+                  {% endif %}
+              </div>
+          </div>
       </div>
   </div>
 </body>

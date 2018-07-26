@@ -5,9 +5,9 @@
 <div class="container" style="margin-top:3%;">
   <div class="section">
     <div class="row">
-      <div class="card large col l8 push-l2 purple accent-4">
+      <div class="card large col l8 push-l2 blue darken-3">
         <div class="card-content">
-          <form id="registrationform" action="{% url 'register' %}" data-url='{{ request.build_absolute_uri|safe }}' novalidate>
+          <form id="registrationform" action="{% url 'register' %}" data-url='{{ request.build_absolute_uri|safe }}' novalidate autocomplete="off">
             {% csrf_token %}
             <div class="row">
               {% for field in form.visible_fields %}
@@ -31,10 +31,10 @@
                 </div>
               <div class="row center">
                 <!--<a href="{% url 'login' %}"><button name="back" id="back" type="button" class="btn waves-effect grey col l6" >{% trans 'Login' %}</button></a>-->
-                <button name="register" id="register" type="submit" class="btn waves-effect red accent-2 col l6 push-l3" >{% trans 'Sign up' %}</button>
+                <button name="register" id="register" type="submit" class="btn waves-effect white blue-text text-darken-3 col l6 push-l3" >{% trans 'Sign up' %}</button>
               </div>
               <div class="card-action white">
-              Do you have an account already? <a class="purple-text text-accent-4" href="{% url 'login' %}">Sign in</a>
+              Do you have an account already? <a class="white blue-text text-darken-3" href="{% url 'login' %}">Sign in</a>
               </div>
             </div>
           </form>

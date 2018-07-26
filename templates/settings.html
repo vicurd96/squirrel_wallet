@@ -8,11 +8,11 @@
             <div class="col s12 m12 l8">
                 <div class="card large">
                      <ul class="tabs">
-                         <li class="tab col s4">
+                         <li class="tab col s6">
                              <a href="#profile">Edit profile</a>
                          </li>
-                         <li class="tab col s4"><a href="#pass">Change password</a></li>
-                         <li class="tab col s4"><a href="#twofactor">2-pass authenticator</a></li>
+                         <li class="tab col s6"><a href="#pass">Change password</a></li>
+                         <!--<li class="tab col s4"><a href="#twofactor">2-pass authenticator</a></li>-->
                      </ul>
                    <div class="card-content">
                        <div id="profile">{% include 'profile.html' %}</div>
@@ -26,11 +26,59 @@
                         <li class="tab"><a href="#yourprofile">Your profile</a></li>
                     </ul>
                     <div class="card-content">
+                        <div class="row center-align">
+                            <div class="col s12 m12 l12">
+                                <img class="avatar circle z-depth-1" src="/{{ user.profile.avatar.url }}"/>
+                            </div>
+                            <div class="col s12 m12 l12">
+                                <div class="container" style="width:85%">
+                                    <div class="section" style="margin-top:20px;">
+                                            {% if user.profile.gender %}
+                                                {% if user.profile.gender == 'Male' %}
+                                                    <i class="material-icons left">wc</i><span class="right">&nbsp;{{user.profile.gender}}</span><span class="right"><i class="fas fa-mars right blue-text" style="font-size:22px;"></i></span>
+                                                    <br>
+                                                    <div class="divider"></div><br>
+                                                {% elif user.profile.gender == 'Female' %}
+                                                    <i class="material-icons left">wc</i><span class="right">&nbsp;{{user.profile.gender}}</span><span class="right"><i class="fas fa-venus right blue-text" style="font-size:22px;"></i></span>
+                                                    <br>
+                                                    <div class="divider"></div><br>
+                                                {% endif %}
+                                            {% endif %}
+                                            {% if user.profile.birthdate %}
+                                                <i class="material-icons left">perm_contact_calendar</i><span class="right">&nbsp;{{user.profile.birthdate}}</span>
+                                                <br>
+                                                <div class="divider"></div><br>
+                                            {% endif %}
+                                            {% if user.profile.country %}
+                                                <i class="material-icons left">language</i><span class="right">&nbsp;{{user.profile.country.name}}</span><img class="right" style="margin-top:6px;" src="{{user.profile.country.flag}}"/>
+                                                <br>
+                                                <div class="divider"></div><br>
+                                            {% endif %}
+                                            {% if user.profile.phone %}
+                                                {% if user.profile.code_phone %}
+                                                    <i class="material-icons left">phone</i><span class="right">&nbsp;({{ user.profile.code_phone }})&nbsp;{{user.profile.phone}}</span>
+                                                    <br>
+                                                    <div class="divider"></div>
+                                                {% else %}
+                                                {% endif %}
+                                            {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    .avatar {
+        max-height: 160px;
+        max-width: 160px;
+    }
+</style>
 {% include 'tx.html' %}
 {% endblock %}
+

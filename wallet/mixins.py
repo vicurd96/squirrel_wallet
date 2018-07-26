@@ -35,9 +35,16 @@ class WalletMixin(ContextMixin):
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(**kwargs)
         if self.request.user and self.request.user.is_authenticated:
+            context['has_tx'] = True if self.get_tx() else False
+            context['has_operations'] = True if Operation.objects.filter(user=self.request.user).order_by(
+                "-created_at") else False
+            context['activity'] = {
+                'operations': Operation.objects.filter(user=self.request.user).order_by('-created_at')[:5],
+                'transactions': self.get_tx()
+            }
+
             transaction_form = TransactionForm(self.request.GET)
             context['transaction_form'] = transaction_form
-            context['avatar'] = self.request.user.profile.avatar
 
             context['has_wallet'] = True if self.get_wallet() \
                 else False
@@ -68,15 +75,6 @@ class WalletMixin(ContextMixin):
 
             context['has_btc'] = True if self.get_wallet().filter(currency__abrev='BTC') else False
             context['has_eth'] = True if self.get_wallet().filter(currency__abrev='ETH') else False
-            context['has_tx'] = True if self.get_tx() else False
-            context['has_operations'] = True if Operation.objects.filter(user=self.request.user).order_by(
-                "-created_at") else False
-
-            #            CAMBIAR ESTO A CELERY
-            '''try:
-                context['has_connection'] = requests.
-            except requests.ConnectionError:
-                context['has_connection'] = False'''
         return context
 
 

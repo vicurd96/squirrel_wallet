@@ -1,5 +1,5 @@
 .tabs .tab a{
-    color:#bdbdbd;
+    color:#01579b;
 }
 .tabs .tab a:hover,.tabs .tab a.active {
 	background-color:transparent;
@@ -10,4 +10,9 @@
 }
 .tabs .indicator {
 	background-color:#01579b;
+}
+
+.thumbnail {
+    max-height: 15px;
+    max-width: 15px;
 }

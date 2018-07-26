@@ -153,6 +153,7 @@ class Profile(models.Model):
                                       options={'quality': 60})'''
     birthdate = models.DateField(_('Birthdate'), null=True, blank=True)
     address = models.CharField(_('Address'), null=True, blank=True, max_length=52)
+    code_phone = models.CharField(_('Phone code'), null=True,blank=True,max_length=3)
     phone = models.CharField(_('Number phone'), null=True, blank=True, max_length=11)
     gender = models.CharField(_('Gender'), null=True, max_length=7, choices=GENDER_CHOICES, default=OTRO)
     country = CountryField(_('Country'), null=True, blank_label='')

@@ -7,12 +7,13 @@ $(document).ready(function(){
   $('.tooltipped').tooltip();
   $('select').formSelect();
   $('.datepicker').datepicker({ 'yearRange': 100, 'format':'mm-dd-yyyy' });
-  $('.carousel').carousel();
-
+  $('.carousel.carousel-slider').carousel({
+      fullWidth: true,
+      indicators: true
+    });
 
   $("#profileform").on('submit', postMethodFile);
-  $("#loginform").materialvalidation();
-  $("#loginform").on('submit', postMethodValidation);
+  $("#loginform").on('submit', postMethod);
   $("#changepassform").on('submit', postMethod);
   $("#transactionform").materialvalidation();
   $("#transactionform").on('submit', postMethod);
@@ -109,13 +110,16 @@ function postMethodValidation(evt){
             data: $formData,
             dataType: "json",
             success: function(data){
-              M.toast({html: data['message']})
-              window.location.href = $redirect
+              M.toast({html: '<i class="material-icons">check</i>&nbsp;'+ data['message'], classes: 'green rounded'})
+                window.location.href = $redirect
+                if($('.modal').isOpen == true){
+                  $('.modal').modal('close');
+                }
             },
             error: function(response){
               Object.keys(response.responseJSON).forEach(function(key){
-                  M.toast({html: response.responseJSON[key]})
-                });
+                M.toast({html: '<i class="material-icons">error</i>&nbsp;'+ response.responseJSON[key], classes: 'red rounded'})
+              });
             },
         })
     }

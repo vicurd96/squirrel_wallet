@@ -16,11 +16,11 @@
     </div>
 <div class="section">
     <div class="row">
-        <div class="col s6 l5 push-l1">
+        <div class="col s6 m5 l5 push-l1">
             <div class="card medium">
                 <div class="card-tabs">
                     <ul class="tabs tabs-fixed-width z-depth-1">
-                        <li class="tab"><a href="#bitcoininfo">Wallets</a></li>
+                        <li class="tab"><a href="#bitcoininfo">Wallet</a></li>
                     </ul>
                 </div>
                 <div class="card-content wallets slider">
@@ -52,7 +52,7 @@
                 </div>
             </div>
         </div>
-        <div class="col s12 l5 push-l1">
+        <div class="col s12 m5 l5 push-l1">
             <div class="card medium">
                 <div class="card-tabs">
                     <ul class="tabs tabs-fixed-width z-depth-1">
@@ -64,6 +64,7 @@
                     <div id="activitychart"></div>
                 </div>
             </div>
+        </div>
     </div>
     <div class="row">
         <div class="col s12 l7 push-l1">
@@ -82,49 +83,46 @@
         </div>
         <div class="col s12 l3 push-l1">
            <div class="card medium">
-                <div class="card-tabs">
-                    <ul class="tabs tabs-fixed-width z-depth-1">
-                        <li class="tab"><a class="active" href="#activitychart">Tips</a></li>
-                    </ul>
-                </div>
-                <div class="card-content">
-                    <div id="tips"></div>
-                </div>
-            </div>
+               <div id="tips" class="carousel carousel-slider center" style="height:350px;">
+                   <div class="carousel-fixed-item center">
+                       <button class="btn white grey-text darken-text-2">TIPS</button>
+                   </div>
+                   <div class="carousel-item red white-text" href="#one!">
+                       <div class="section" style="margin-top:50px;">
+                           <div class="container">
+                               <i class="medium material-icons">build</i><br>
+                               <h2>Become Fluent in Technical Analysis</h2>
+                           </div>
+                       </div>
+                   </div>
+                   <div class="carousel-item amber white-text" href="#two!">
+                       <div class="section" style="margin-top:50px;">
+                           <div class="container">
+                               <i class="medium material-icons">directions_run</i><br>
+                               <h2>Adopt a Sustainable Pace</h2>
+                           </div>
+                       </div>
+                   </div>
+                   <div class="carousel-item green white-text" href="#three!">
+                       <div class="section" style="margin-top:50px;">
+                           <div class="container">
+                               <i class="medium material-icons">new_releases</i><br>
+                               <h2>Stay Aware of News Items</h2>
+                           </div>
+                       </div>
+                   </div>
+                   <div class="carousel-item blue white-text" href="#four!">
+                       <div class="section" style="margin-top:50px;">
+                           <div class="container">
+                               <i class="medium material-icons">block</i><br>
+                               <h2>Implement Stop Losses</h2>
+                           </div>
+                       </div>
+                   </div>
+               </div>
+           </div>
         </div>
     </div>
-<!--<div class="row col s6 l6">
-<div class="card large blue darken-4">
-    <div class="card-content">
-        <span class="card-title right-align white-text">Ether information</span>
-        {% if has_wallet and has_eth %}
-        <div class="divider"></div>
-        <div class="section"></div>
-        <ul class="collection">
-            <li class="collection-item avatar">
-            <span class="title grey-text text-darken-4">{% trans "Your balance:" %} </span>
-                <i class="fab fa-ethereum circle grey darken-2"></i><div>{{ balance_eth|floatformat:2 }} ethers</div>
-            </li>
-            <li class="collection-item avatar"><span class="title grey-text text-darken-4">{% trans "Regular gas price: "%}</span>
-                <i class="material-icons circle blue">attach_money</i><div>{{ gas_price }} ethers</div>
-            </li>
-            <li class="collection-item avatar"><span class="title grey-text text-darken-4">{% trans "Value in dollars: "%}</span>
-                <i class="fas fa-hand-holding-usd circle green"></i><div>{{ eth_to_usd|floatformat:2 }} USD$ p/ETH</div>
-            </li>
-            <li class="collection-item avatar"><span class="title grey-text text-darken-4">{% trans "Value in euros: "%}</span>
-                <i class="fas fa-euro-sign circle red"></i><div>{{ eth_to_eur|floatformat:2 }} EUR₵ p/ETH</div>
-            </li>
-        </ul>
-        {% else %}
-            <div class="divider"></div>
-            <br><br>
-            <center><i class="white-text fab fa-ethereum fa-10x"></i></center>
-            <br><br>
-            <center><a class=" waves-effect waves-light btn btn-large white blue-text text-darken-4" href="#!">Create your wallet</a></center>
-        {% endif %}
-    </div>
-</div>
-</div>-->
 </div>
 <style>
 .nextArrowBtn{
@@ -160,6 +158,7 @@
 
 </style>
 <script>
+$(document).ready(function(){
     $('.wallets').slick({
         autoplay: true,
         autoplaySpeed: 5000,
@@ -170,6 +169,24 @@
         prevArrow: '<i class="small material-icons prevArrowBtn">keyboard_arrow_left</i>',
         nextArrow: '<i class="small material-icons nextArrowBtn">keyboard_arrow_right</i>',
     });
+
+    var tipsId = setInterval(function() {
+      if(!($("#tips").get(0).M_Carousel.pressed) && !($("#tips").get(0).M_Carousel.dragged)){
+        $('#tips').carousel('next');
+      }
+    }, 5000);
+
+    $("#tips").on('click',function() {
+      clearInterval(skillsId);
+      setTimeout(function() {
+        setInterval(function() {
+          if(!($("#tips").get(0).M_Carousel.pressed) && !($("#tips").get(0).M_Carousel.dragged)){
+            $('#tips').carousel('next');
+          }
+        }, 5000);
+      }, 10000);
+    });
+});
 </script>
 {% csrf_token %}
 {% include 'tx.html' %}

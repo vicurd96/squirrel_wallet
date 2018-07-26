@@ -8,6 +8,7 @@ from django.utils.translation import gettext as _
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from bit.network import get_fee, get_fee_cached, NetworkAPI
 from django_countries.widgets import CountrySelectWidget
+from phonenumbers import COUNTRY_CODE_TO_REGION_CODE as region_code
 from django.db.models import Q
 
 
@@ -214,12 +215,13 @@ class ProfileForm(forms.ModelForm):
                                     'class': 'datepicker'
                                 }))
     address = forms.CharField(label=_('Address'), required=False, max_length=52)
-    phone = forms.CharField(label=_('Number phone'), required=False, max_length=11)
+    phone = forms.CharField(label=_('Number phone'), required=False, max_length=11, widget=forms.NumberInput())
 
     class Meta:
         model = Profile
         fields = ('avatar', 'gender', 'birthdate', 'address', 'country', 'phone')
         widgets = {'country': CountrySelectWidget(layout='{widget}')}
+
 
     def __init__(self,user, *args, **kwargs):
         self.user = user
@@ -231,6 +233,7 @@ class ProfileForm(forms.ModelForm):
         self.fields['address'].initial = self.user.profile.address
         self.fields['phone'].initial = self.user.profile.phone
         self.fields['avatar'].initial = self.user.profile.avatar
+
 
     def save(self, commit=True):
         for clean in self.cleaned_data:
@@ -248,11 +251,11 @@ class ProfileForm(forms.ModelForm):
                 elif clean == 'avatar':
                     self.user.profile.avatar = self.cleaned_data['avatar']
 
-        '''self.user.profile.gender = self.cleaned_data['gender']
-        self.user.profile.birthdate = self.cleaned_data['birthdate']
-        self.user.profile.address = self.cleaned_data['address']
-        self.user.profile.phone = self.cleaned_data['phone']
-        self.user.profile.country = self.cleaned_data['country']'''
+        if self.cleaned_data['country']:
+            for code,isos in region_code.items():
+                if self.cleaned_data['country'].upper() in isos:
+                    self.user.profile.code_phone = code
+
         if commit:
             op = Operation.objects.create(type='Update')
             op.user.add(self.user)

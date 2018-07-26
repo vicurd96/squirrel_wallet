@@ -231,89 +231,33 @@ class WalletView(WalletMixin, LoginRequiredMixin, generic.ListView):
     redirect_field = None
     template_name = 'wallet.html'
     context_object_name = 'wallet'
-    success_url = '/wallet'
     data = None
 
     def get_queryset(self):
         return Wallet.objects.filter(user=self.request.user)
 
-    def get_context_data(self, *args, **kwargs):
-        context = super(WalletView, self).get_context_data(**kwargs)
-        if self.get_wallet():
-            if self.request.is_ajax():
-                wallet = self.get_wallet().filter(currency__abrev='BTC')
-                wallet = wallet.get() if wallet else None
-                if(wallet):
-                    self.data = {
-                        'has_wallet': True,
-                        'qrcode': wallet.qrcode,
-                        'address': wallet.address,
-                        'balance': wallet.balance,
-                        'tx_count': Transaction.objects.filter(wallet=wallet, type='OUT').count(),
-                        'last_tx': Transaction.objects.filter(wallet=wallet, type='OUT').
-                            order_by('-created_at').values_list('txid',flat=True).first(),
-                        'last_to': Transaction.objects.filter(wallet=wallet, type='IN').
-                            order_by('-created_at').values_list('txid',flat=True).first(),
-                    }
-                return JsonResponse(self.data);
-            context['has_wallet'] = True
-            wallet = self.get_wallet().filter(currency__abrev='BTC')
-            wallet = wallet.get() if wallet else None
-            if wallet:
-                context['wallet'] = OrderedDict({
-                    ('qrcode', wallet.qrcode),
-                    ('address', wallet.address),
-                    ('balance', wallet.balance),
-                    ('tx_count', Transaction.objects.filter(wallet=wallet, type='OUT').count()),
-                    ('last_tx',
-                     Transaction.objects.filter(wallet=wallet, type='OUT').order_by('-created_at').values_list('txid',
-                                                                                                               flat=True).first()),
-                    ('last_to',
-                     Transaction.objects.filter(wallet=wallet, type='IN').order_by('-created_at').values_list('txid',
-                                                                                                              flat=True).first()),
-                })
-
-                # CAMBIAR ESTO
-                context['wallet'].move_to_end('qrcode')
-                context['wallet'].move_to_end('address')
-                context['wallet'].move_to_end('balance')
-                context['wallet'].move_to_end('tx_count')
-                context['wallet'].move_to_end('last_tx')
-                context['wallet'].move_to_end('last_to')
-                context['wallet'] = context['wallet'].items()
-        else:
-            context['has_wallet'] = False
-        return context
-
 
 class Dashboard(WalletMixin, LoginRequiredMixin, generic.ListView):
     redirect_field_name = None
     template_name = 'dashboard.html'
-    success_url = '/wallet/dashboard'
+    success_url = 'wallet:dashboard'
 
     def get_queryset(self):
         return Wallet.objects.filter(user=self.request.user)
 
     def get_context_data(self, *args, **kwargs):
         context = super(Dashboard, self).get_context_data(**kwargs)
-        transaction_form = TransactionForm(self.request.GET)
-        context['transaction_form'] = transaction_form
-        context['has_tx'] = True if self.get_tx() else False
         if self.get_queryset():
-            context['has_wallet'] = True
             wallet = Wallet.objects.filter(user=self.request.user, currency__abrev='BTC')
             if wallet:
                 context['balance'] = wallet.get().balance
                 # CAMBIAR POR CELERY
-                #context['fee'] = get_fee_cached(fast=False)
-                context['last_transactions'] = Transaction.objects.filter(
-                    wallet=self.get_queryset().filter(currency__abrev='BTC').get())
+                # context['fee'] = get_fee_cached(fast=False)
         else:
             context['has_wallet'] = False
-        context['latest_operations'] = Operation.objects.filter(user=self.request.user).values_list()[:5]
         if Value.objects.all():
             c = CurrencyConverter()
             context['value_to_usd'] = Value.objects.filter().order_by('-date').values_list('value', flat=True).first()
             context['value_to_eur'] = c.convert(context['value_to_usd'], 'USD', 'EUR')
-        #context['linechart'] = [self.btc_currency_value_chart(), self.btc_tx_count()]
+        # context['linechart'] = [self.btc_currency_value_chart(), self.btc_tx_count()]
         return context
