@@ -241,6 +241,7 @@ class Transaction(models.Model):
     to = models.CharField(_('To address'), null=False, max_length=64)
     status = models.NullBooleanField(_('Status'), default=False)
     created_at = models.DateTimeField(_('Created at'), auto_now_add=True)
+    #sent = models.DateTimeField(_('Sent at'))
     type = models.CharField(_('Type'), max_length=3, choices=TX_CHOICES, default=OUT)
     amount = models.DecimalField(_('Amount'), null=True, max_digits=16, decimal_places=8)
     fee = models.DecimalField(_('Fee'), null=True, max_digits=16, decimal_places=8)

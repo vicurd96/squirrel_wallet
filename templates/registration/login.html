@@ -6,33 +6,35 @@
 <div class="container" style="margin-top:3%;">
     <div class="section">
         <div class="row">
-          <div class="card medium col l4 push-l4 blue darken-3">
-        		<div class="card-content">
-        			<form id="loginform" data-url='{{ request.build_absolute_uri|safe }}' data-redirect='{% url "dashboard" %}' novalidate autocomplete="off">
-                        {% csrf_token %}
-                        {% for field in form %}
-                        <div class="row">
-                          <div class="input-field col l12">
-                              {% if field.name == 'username' %}
-                              <i class="white-text material-icons prefix">account_circle</i>
-                              {% else %}
-                              <i class="white-text material-icons prefix">enhanced_encryption</i>
-                              {% endif %}
-                              {{ field }}
-                              <label class="white-text" for="{{ field.name }}">{{ field.label }}</label>
-                              <span class="helper-text grey-text text-lighten-1" >{{ field.help_text }}</span>
-                          </div>
-                        </div>
-                        {% endfor %}
-                        <div class="row center">
-                          <button type="submit" class="btn btn-medium waves-effect white blue-text text-darken-3 col l6 push-l3">{% trans 'Sign in' %}</button>
-                        </div>
-              </form>
-              <div class="card-action white">
-                Don't have an account? <a class="blue-text text-darken-3" href="{% url 'register' %}">Create One</a>
-              </div>
-        		</div>
-    	    </div>
+            <div class="col l4 push-l4">
+                <div class="card blue darken-3">
+                    <div class="card-content">
+                        <form id="loginform" data-url='{{ request.build_absolute_uri|safe }}' data-redirect='{% url "dashboard" %}' novalidate autocomplete="off">
+                            {% csrf_token %}
+                            {% for field in form %}
+                            <div class="row">
+                                <div class="input-field col l12">
+                                    {% if field.name == 'username' %}
+                                    <i class="white-text material-icons prefix">contact_mail</i>
+                                    {% else %}
+                                    <i class="white-text material-icons prefix">dialpad</i>
+                                    {% endif %}
+                                    {{ field }}
+                                    <label class="white-text" for="{{ field.name }}">{{ field.label }}</label>
+                                    <span class="helper-text grey-text text-lighten-1" >{{ field.help_text }}</span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                            <div class="row center">
+                              <button type="submit" class="btn btn-medium waves-effect white blue-text text-darken-3 col l6 push-l3">{% trans 'Sign in' %}</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="card-action white">
+                        Don't have an account? <a class="blue-text text-darken-3" href="{% url 'register' %}">Create One</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

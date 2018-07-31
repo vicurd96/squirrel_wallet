@@ -53,16 +53,28 @@
             </div>
         </div>
         <div class="col s12 m5 l5 push-l1">
-            <div class="card medium">
-                <div class="card-tabs">
-                    <ul class="tabs tabs-fixed-width z-depth-1">
-                        <li class="tab"><a class="active" href="#activitychart">Activity</a></li>
-                         <li class="tab"><a href="#activitychart">Security</a></li>
-                    </ul>
-                </div>
-                <div class="card-content">
-                    <div id="activitychart"></div>
-                </div>
+            <div id="charts" class="card">
+                <div class="carousel carousel-slider center" style="height:350px;">
+                   <!--<div class="carousel-fixed-item center">
+                       <button class="btn white grey-text darken-text-2">TIPS</button>
+                   </div>-->
+                   <div class="carousel-item white black-text" href="#one!">
+                        <div class="section">
+                           <div id="wrapper" style="position: relative; height: 45vh">
+                                <canvas id="activitychart"></canvas><br>
+                                <button class="btn white darken-1 blue-text text-darken-2 z-depth-2">ACTIVITY</button><br>
+                           </div>
+                        </div>
+                   </div>
+                   <div class="carousel-item white white-text" href="#two!">
+                       <div class="section">
+                           <div id="wrapper2" style="position: relative; height: 45vh">
+                                <canvas id="securitychart"></canvas><br>
+                                <button class="btn white darken-1 blue-text text-darken-2 z-depth-2">SECURITY</button><br>
+                           </div>
+                       </div>
+                   </div>
+               </div>
             </div>
         </div>
     </div>
@@ -125,6 +137,33 @@
     </div>
 </div>
 <style>
+
+#charts .carousel .indicators .indicator-item.active{
+    background-color: #000;
+}
+
+#charts .carousel .indicators .indicator-item {
+    display: inline-block;
+    position: relative;
+    cursor: pointer;
+    height: 8px;
+    width: 8px;
+    margin: 24px 4px;
+    background-color: rgba(0, 0, 0, 0.5);
+    -webkit-transition: background-color .3s;
+    transition: background-color .3s;
+    border-radius: 50%;
+}
+
+#charts .carousel .indicators {
+    position: absolute;
+    text-align: center;
+    left: 0;
+    right: 0;
+    bottom: -12px;
+    margin: 0;
+}
+
 .nextArrowBtn{
     -moz-transition: all .2s ease-in;
     -o-transition: all .2s ease-in;
@@ -159,6 +198,66 @@
 </style>
 <script>
 $(document).ready(function(){
+    var ctx = document.getElementById('activitychart').getContext('2d');
+    var ctx2 = document.getElementById('securitychart').getContext('2d');
+
+    var myDoughnutChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+        datasets: [{
+            data: {{ activity_chart }},
+            backgroundColor: [
+                'rgba(33,150,243,0.8)',
+                'rgba(255,82,82,0.8)',
+            ],
+        }],
+
+
+
+            // These labels appear in the legend and in the tooltips when hovering different arcs
+            labels: [
+                'Transactions',
+                'Operations',
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            legend: {
+                position: 'bottom',
+            }
+        }
+    });
+
+    var securityChart = new Chart(ctx2, {
+        type: 'doughnut',
+        data: {
+        datasets: [{
+            data: [10, 6],
+            backgroundColor: [
+                'rgba(189,189,189,0.8)',
+                'rgba(255, 206, 86, 0.8)',
+            ],
+        }],
+
+
+
+            // These labels appear in the legend and in the tooltips when hovering different arcs
+            labels: [
+                'Not configured',
+                'Profile',
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            legend: {
+                position: 'bottom',
+            }
+        }
+    });
+
+
     $('.wallets').slick({
         autoplay: true,
         autoplaySpeed: 5000,

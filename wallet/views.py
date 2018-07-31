@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.urls import reverse
 
 from wallet.models import *
@@ -247,6 +249,7 @@ class Dashboard(WalletMixin, LoginRequiredMixin, generic.ListView):
 
     def get_context_data(self, *args, **kwargs):
         context = super(Dashboard, self).get_context_data(**kwargs)
+        chart_data = []
         if self.get_queryset():
             wallet = Wallet.objects.filter(user=self.request.user, currency__abrev='BTC')
             if wallet:
@@ -255,6 +258,20 @@ class Dashboard(WalletMixin, LoginRequiredMixin, generic.ListView):
                 # context['fee'] = get_fee_cached(fast=False)
         else:
             context['has_wallet'] = False
+
+        some_day_last_week = timezone.now() - timedelta(days=7)
+
+
+        transactions = 0
+
+        for wallet in self.get_queryset():
+            transactions += Transaction.objects.filter(wallet=wallet,created_at__gte=some_day_last_week, created_at__lt=timezone.now()).count()
+        chart_data.append(transactions)
+
+        operations = Operation.objects.filter(user=self.request.user,created_at__gte=some_day_last_week, created_at__lt=timezone.now()).count()
+        chart_data.append(operations)
+
+        context['activity_chart'] = chart_data
         if Value.objects.all():
             c = CurrencyConverter()
             context['value_to_usd'] = Value.objects.filter().order_by('-date').values_list('value', flat=True).first()

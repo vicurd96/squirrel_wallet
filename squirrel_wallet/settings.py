@@ -127,9 +127,17 @@ WSGI_APPLICATION = 'squirrel_wallet.wsgi.application'
 PROJECT_DIR = os.path.abspath(os.path.dirname(__file__))
 
 DATABASES = {
+        # 'default': {
+        #    'ENGINE': 'django.db.backends.sqlite3',
+        #    'NAME': os.path.join(PROJECT_DIR, 'squirrel_wallet.db'),
+        #}
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(PROJECT_DIR, 'squirrel_wallet.db'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'squirrel_wallet',
+        'USER': 'licom',
+        'PASSWORD': 'licom2018',
+        'HOST': 'localhost',   # Or an IP Address that your DB is hosted on
+        'PORT': '3306',
     }
 }
 
@@ -175,5 +183,3 @@ STATICFILES_DIRS = [
 ]
 
 STATIC_URL = '/static/'
-
-
